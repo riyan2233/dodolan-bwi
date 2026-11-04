@@ -571,12 +571,12 @@ body[data-theme="coffee-cream"] { --accent-600: #92400e; --accent-soft: #d6a86d;
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Background Web (Upload JPG/PNG)</label>
                                 <input type="file" id="set-page-bg" accept="image/png, image/jpeg" onchange="previewLocalBackground(event)" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-500 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700">
-                                <p class="text-[11px] text-slate-500 mt-1">Upload foto background agar tampilan lebih modern. Bisa dikosongkan jika ingin memakai gradien tema saja.</p>
+                                <p class="text-[11px] text-slate-500 mt-1">Foto dioptimalkan otomatis sebelum disimpan ke Firebase. Pilih mode Foto + Overlay Lembut agar gambar terlihat.</p>
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Mode Background</label>
                                 <select id="set-background-mode" onchange="previewBackgroundMode(this.value)" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500">
-                                    <option value="gradient">Gradien Tema Saja</option>
+                                    <option value="gradient">Gradien Tema Saja (foto disembunyikan)</option>
                                     <option value="photo-soft">Foto + Overlay Lembut</option>
                                     <option value="photo-bold">Foto Lebih Jelas</option>
                                 </select>
@@ -798,6 +798,7 @@ function renderBackgroundPreview(url=settings.pageBackground||''){
   box.innerHTML = `<div>${url ? 'Background custom aktif' : 'Pratinjau gradien tema aktif'}</div>`;
 }
 let previewBackgroundData=null;
+let backgroundPreviewTask=null;
 function previewBackgroundMode(mode){
   const activeMode=['gradient','photo-soft','photo-bold'].includes(mode)?mode:'gradient';
   document.body.dataset.bgmode=activeMode;
@@ -808,17 +809,28 @@ function previewBackgroundMode(mode){
 }
 async function previewLocalBackground(event){
   const file=event?.target?.files?.[0];
-  if(!file){previewBackgroundData=null;previewBackgroundMode($('set-background-mode').value);return;}
+  if(!file){previewBackgroundData=null;backgroundPreviewTask=null;previewBackgroundMode($('set-background-mode').value);return;}
+  previewBackgroundData=null;
+  showSettingsSaveResult('Sedang menyiapkan foto background. Simpan setelah pratinjau tampil.','info');
+  const task=fileToSmallDataUrl(file,90000,1200);
+  backgroundPreviewTask=task;
   try{
-    previewBackgroundData=await fileToSmallDataUrl(file,90000,1200);
+    const prepared=await task;
+    if(backgroundPreviewTask!==task)return;
+    previewBackgroundData=prepared;
     if($('set-clear-page-bg')) $('set-clear-page-bg').checked=false;
     if($('set-background-mode').value==='gradient') $('set-background-mode').value='photo-soft';
     previewBackgroundMode($('set-background-mode').value);
+    showSettingsSaveResult('Foto sudah siap. Klik Simpan Pengaturan & Tema untuk menyimpan ke Firebase.','info');
   }catch(e){
     console.error('Preview background',e);
-    previewBackgroundData=null;
-    if(event?.target)event.target.value='';
-    showToast('Foto background gagal diproses. Gunakan JPG/PNG yang lebih kecil.','error');
+    if(backgroundPreviewTask===task){
+      previewBackgroundData=null;
+      if(event?.target)event.target.value='';
+      showSettingsSaveResult('Foto background gagal diproses. Gunakan JPG/PNG maksimal 15 MB atau foto dengan resolusi lebih kecil.');
+    }
+  }finally{
+    if(backgroundPreviewTask===task)backgroundPreviewTask=null;
   }
 }
 
@@ -1147,7 +1159,7 @@ function showSettingsSaveResult(message,level='error'){
 function explainSettingsError(error){
   const code=String(error?.code||'').toLowerCase();
   const message=String(error?.message||'');
-  if(code.includes('permission-denied'))return 'Firestore menolak penyimpanan (permission-denied). Login admin sudah masuk, tetapi Rules untuk dokumen siteConfig/public belum mengizinkan perubahan ini. Periksa Firebase Console → Firestore Database → Rules. Jangan mengizinkan semua orang menulis.';
+  if(code.includes('permission-denied'))return 'Ditolak oleh aturan Firestore (permission-denied). Aturan lama DODOLAN hanya mengizinkan 3 tema dan 6 field pengaturan. Pasang file firestore.rules terbaru di Firebase Console → Firestore Database → Rules → Publish. Jangan mengubahnya menjadi allow write: if true.';
   if(code.includes('unauthenticated'))return 'Sesi Firebase sudah berakhir (unauthenticated). Login ulang sebagai admin, kemudian simpan kembali.';
   if(code.includes('resource-exhausted')||message.toLowerCase().includes('too large')||message.toLowerCase().includes('size limit'))return 'Data pengaturan terlalu besar untuk Firestore. Coba tanpa foto background, atau gunakan foto yang lebih kecil.';
   if(code.includes('unavailable')||code.includes('deadline-exceeded')||code.includes('network-request-failed'))return 'Koneksi Firebase sedang bermasalah. Periksa internet, lalu coba simpan lagi.';
@@ -1192,6 +1204,7 @@ async function handleSaveSettings(event){
   const priorLabel=btn.textContent;
   btn.textContent='Menyimpan pengaturan...';
   try{
+    if(backgroundPreviewTask)await backgroundPreviewTask;
     const adminPhoto=$('set-admin-photo').files[0],logo=$('set-web-logo').files[0],pageBg=$('set-page-bg').files[0];
     if(adminPhoto)next.adminPhoto=await fileToSmallDataUrl(adminPhoto,45000,420);
     if(logo)next.webLogo=await fileToSmallDataUrl(logo,45000,420);
@@ -1203,7 +1216,12 @@ async function handleSaveSettings(event){
       if(next[key]!==settings[key]&&next[key]!==undefined)patch[key]=next[key];
     }
     if(!Object.keys(patch).length){showSettingsSaveResult('Tidak ada perubahan baru. Pengaturan yang tampil masih sama.','info');return;}
-    await setDoc(doc(db,'siteConfig','public'),patch,{merge:true});
+    // Rules memeriksa isi dokumen penuh. Saat dokumen belum dibuat, simpan nilai
+    // bawaan bersama perubahan supaya seluruh field wajib tersedia sejak awal.
+    const configRef=doc(db,'siteConfig','public');
+    const existing=await getDoc(configRef);
+    const toWrite=existing.exists()?patch:{...DEFAULT_SETTINGS,...settings,...patch};
+    await setDoc(configRef,toWrite,{merge:true});
     settings={...settings,...patch};
     applySettingsToUI();
     previewBackgroundData=null;
