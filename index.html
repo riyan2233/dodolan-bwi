@@ -83,6 +83,39 @@ body[data-theme="teal-modern"] { --accent-600: #0d9488; --accent-soft: #5eead4; 
 body[data-theme="graphite-silver"] { --accent-600: #475569; --accent-soft: #94a3b8; --accent-700: #334155; --bg-a: #0f172a; --bg-b: #334155; --bg-c: #334155; }
 body[data-theme="coffee-cream"] { --accent-600: #92400e; --accent-soft: #d6a86d; --accent-700: #78350f; --bg-a: #3f2d20; --bg-b: #684a32; --bg-c: #78350f; }
 
+        body {
+            position: relative;
+            background: transparent !important;
+            isolation: isolate;
+            --page-bg-image: none;
+        }
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            background-image:
+                linear-gradient(135deg,var(--bg-a,#164e9b),var(--bg-b,#3730a3) 55%,var(--bg-c,#1d4ed8)),
+                var(--page-bg-image, none);
+            background-size: cover, cover;
+            background-position: center, center;
+            background-repeat: no-repeat, no-repeat;
+            transition: background-image .3s ease;
+        }
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background: rgba(15,23,42,.08);
+            backdrop-filter: blur(0px);
+            transition: background .25s ease, backdrop-filter .25s ease;
+            pointer-events: none;
+        }
+        body[data-bgmode="gradient"]::after { background: rgba(15,23,42,.08); backdrop-filter: blur(0px); }
+        body[data-bgmode="photo-soft"]::after { background: rgba(15,23,42,.30); backdrop-filter: blur(1px); }
+        body[data-bgmode="photo-bold"]::after { background: rgba(15,23,42,.16); backdrop-filter: blur(0px); }
+
         /* DODOLAN RESPONSIVE V2 — desain presisi HP, tablet, laptop */
         :root { color-scheme: light; }
         *, *::before, *::after { box-sizing: border-box; }
@@ -118,7 +151,7 @@ body[data-theme="coffee-cream"] { --accent-600: #92400e; --accent-soft: #d6a86d;
         .theme-choice .theme-swatch { display:flex; height:25px; overflow:hidden; border-radius:8px; margin-bottom:7px; }
         .theme-choice .theme-swatch > i { display:block; flex:1; }
         .theme-choice .theme-label { display:block; font-weight:700; font-size:11px; line-height:1.28; color:#334155; white-space:normal; }
-        body[data-theme] { background-image:linear-gradient(135deg,var(--bg-a),var(--bg-b) 55%,var(--bg-c)) !important; }
+        body[data-theme] { background:none !important; }
         body[data-theme] #hero-banner { background-image:linear-gradient(112deg,var(--accent-600),var(--accent-700),var(--bg-b)) !important; }
         body[data-theme] #logo-container { background-image:linear-gradient(135deg,var(--accent-600),var(--accent-soft)) !important; }
         body[data-theme] .bg-gradient-to-r.from-blue-600 { background-image:linear-gradient(100deg,var(--accent-600),var(--accent-soft)) !important; }
@@ -135,6 +168,28 @@ body[data-theme="coffee-cream"] { --accent-600: #92400e; --accent-soft: #d6a86d;
         body[data-theme] .category-btn.bg-blue-600 { background-color:var(--accent-600) !important; color:white !important; }
         body[data-theme] #hero-banner p { color:rgba(255,255,255,.9) !important; }
         body[data-theme] #hero-banner .bg-white\/20 { background-color:rgba(255,255,255,.18) !important; }
+        .hero-layout { display:grid; grid-template-columns:minmax(0,1.1fr) minmax(280px,.9fr); gap:2rem; align-items:center; }
+        .hero-market-visual { position:relative; min-height:305px; display:flex; align-items:center; justify-content:center; }
+        .hero-visual-shell { position:relative; width:min(100%, 410px); min-height:300px; border-radius:30px; padding:1.1rem; background:rgba(255,255,255,.13); border:1px solid rgba(255,255,255,.18); box-shadow:0 25px 50px rgba(15,23,42,.22); backdrop-filter: blur(12px); overflow:hidden; }
+        .hero-visual-shell::before { content:""; position:absolute; inset:auto auto -65px -65px; width:170px; height:170px; border-radius:999px; background:rgba(255,255,255,.12); filter:blur(12px); }
+        .hero-scene-core { position:relative; width:240px; height:180px; margin:62px auto 50px; }
+        .hero-store-front { position:absolute; left:50%; top:22px; transform:translateX(-50%); width:184px; height:118px; border-radius:28px; background:linear-gradient(155deg, rgba(255,255,255,.95), rgba(255,255,255,.82)); box-shadow:0 18px 40px rgba(15,23,42,.18); }
+        .hero-store-front::before { content:""; position:absolute; left:16px; right:16px; top:-12px; height:28px; border-radius:18px 18px 10px 10px; background:repeating-linear-gradient(90deg, rgba(255,255,255,.98) 0 16px, rgba(255,255,255,.78) 16px 32px, color-mix(in srgb, var(--accent-600,#2563eb) 86%, white) 32px 48px, rgba(255,255,255,.9) 48px 64px); }
+        .hero-store-front::after { content:""; position:absolute; left:22px; right:22px; bottom:18px; height:16px; border-radius:999px; background:rgba(15,23,42,.08); }
+        .hero-store-icon { position:absolute; left:50%; top:50%; transform:translate(-50%,-52%); width:58px; height:58px; border-radius:18px; display:flex; align-items:center; justify-content:center; color:#fff; background:linear-gradient(135deg,var(--accent-600,#2563eb),var(--accent-soft,#38bdf8)); box-shadow:0 16px 28px rgba(37,99,235,.25); font-size:1.35rem; }
+        .hero-person-card { position:absolute; display:flex; align-items:center; gap:.8rem; min-width:185px; max-width:210px; border-radius:20px; padding:.72rem .85rem; background:rgba(255,255,255,.96); color:#0f172a; box-shadow:0 18px 35px rgba(15,23,42,.18); }
+        .hero-person-card.seller { left:2px; top:8px; }
+        .hero-person-card.buyer { right:2px; bottom:10px; }
+        .hero-avatar { width:50px; height:50px; border-radius:999px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:1.2rem; background:linear-gradient(135deg,var(--accent-600,#2563eb),var(--accent-soft,#38bdf8)); flex-shrink:0; }
+        .hero-person-card small { display:block; font-size:11px; color:#64748b; }
+        .hero-person-card b { display:block; font-size:13px; line-height:1.25; }
+        .hero-deal-chip { position:absolute; left:50%; bottom:86px; transform:translateX(-50%); display:inline-flex; align-items:center; gap:.6rem; padding:.72rem 1rem; border-radius:999px; background:linear-gradient(135deg,var(--accent-600,#2563eb),var(--accent-700,#1d4ed8)); color:#fff; box-shadow:0 15px 26px rgba(15,23,42,.18); font-size:12px; font-weight:800; letter-spacing:.02em; }
+        .hero-floating-tag { position:absolute; display:inline-flex; align-items:center; gap:.45rem; padding:.55rem .8rem; border-radius:999px; background:rgba(255,255,255,.96); color:#0f172a; font-size:11px; font-weight:800; box-shadow:0 12px 24px rgba(15,23,42,.15); }
+        .hero-floating-tag.tag-home { right:16px; top:18px; }
+        .hero-floating-tag.tag-field { left:18px; bottom:18px; }
+        .hero-floating-tag.tag-fast { right:34px; bottom:52px; }
+        .background-preview-box { min-height:126px; border-radius:1.2rem; border:1px dashed #cbd5e1; background-size:cover; background-position:center; display:flex; align-items:flex-end; overflow:hidden; }
+        .background-preview-box > div { width:100%; padding:.75rem .9rem; background:linear-gradient(180deg, transparent, rgba(15,23,42,.55)); color:#fff; font-size:12px; font-weight:700; }
         @keyframes bannerFloat { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-6px); } }
         body[data-animation="bounce"] #hero-banner { animation:bannerFloat 3.2s ease-in-out infinite; }
         body[data-animation="none"] #hero-banner { animation:none !important; }
@@ -153,6 +208,16 @@ body[data-theme="coffee-cream"] { --accent-600: #92400e; --accent-soft: #d6a86d;
           main { padding:14px 12px 20px !important; }
           #view-catalog { row-gap:17px; }
           #hero-banner { padding:24px 20px !important; border-radius:19px; }
+          .hero-layout { grid-template-columns:1fr !important; gap:1.25rem; }
+          .hero-market-visual { min-height:250px; }
+          .hero-visual-shell { min-height:250px; padding:.9rem; }
+          .hero-scene-core { width:210px; height:160px; margin:56px auto 44px; }
+          .hero-store-front { width:160px; height:106px; }
+          .hero-store-icon { width:52px; height:52px; font-size:1.15rem; }
+          .hero-person-card { min-width:155px; max-width:170px; padding:.62rem .75rem; gap:.55rem; }
+          .hero-avatar { width:42px; height:42px; font-size:1rem; }
+          .hero-deal-chip { bottom:74px; font-size:11px; padding:.62rem .85rem; }
+          .hero-floating-tag { font-size:10px; padding:.48rem .7rem; }
           #hero-banner h1 { font-size:clamp(1.45rem,5.6vw,2.3rem) !important; line-height:1.19; }
           #hero-banner p { font-size:12px !important; line-height:1.6; }
           #hero-banner .relative.z-10 { row-gap:12px; }
@@ -185,6 +250,7 @@ body[data-theme="coffee-cream"] { --accent-600: #92400e; --accent-soft: #d6a86d;
           #checkout-modal { padding-inline:12px; }
           #checkout-modal > div { border-radius:18px; padding:17px !important; }
           footer { margin-top:25px !important; }
+          .background-preview-box { min-height:104px; }
         }
         @media(max-width:380px) {
           #main-header .brand-wrap p { display:none; }
@@ -248,10 +314,45 @@ body[data-theme="coffee-cream"] { --accent-600: #92400e; --accent-soft: #d6a86d;
             <!-- Hero Banner -->
             <div id="hero-banner" class="relative rounded-3xl bg-gradient-to-r from-blue-600 via-sky-600 to-indigo-700 text-white p-8 sm:p-12 shadow-2xl overflow-hidden animate-pulse-glow">
                 <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
-                <div class="relative z-10 max-w-2xl space-y-4">
-                    <span class="px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-bold uppercase tracking-wider">Platform Jual Beli Terpercaya</span>
-                    <h1 class="text-3xl sm:text-5xl font-black tracking-tight leading-tight">Temukan Rumah, Sawah, Kendaraan & Barang Impian Anda</h1>
-                    <p class="text-blue-100 text-sm sm:text-base font-normal">Jelajahi rumah, sawah, tanah, kendaraan, hingga elektronik pilihan di DODOLAN by Riyan.</p>
+                <div class="absolute left-0 top-0 h-full w-full bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.18),transparent_34%),radial-gradient(circle_at_bottom_left,rgba(255,255,255,0.14),transparent_26%)] pointer-events-none"></div>
+                <div class="relative z-10 hero-layout">
+                    <div class="max-w-2xl space-y-4">
+                        <span class="px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-bold uppercase tracking-wider">Platform Jual Beli Modern</span>
+                        <h1 class="text-3xl sm:text-5xl font-black tracking-tight leading-tight">Jual Beli Rumah, Sawah, Kendaraan & Elektronik Lebih Mudah</h1>
+                        <p class="text-blue-100 text-sm sm:text-base font-normal">Desain modern, katalog rapi, tema bisa diganti, dan pengunjung lebih nyaman saat membuka DODOLAN di HP maupun laptop.</p>
+                        <div class="flex flex-wrap gap-3 pt-2 text-[11px] sm:text-xs font-bold">
+                            <span class="px-3 py-2 rounded-full bg-white/15 border border-white/20"><i class="fa-solid fa-mobile-screen-button mr-1.5"></i>Presisi di HP</span>
+                            <span class="px-3 py-2 rounded-full bg-white/15 border border-white/20"><i class="fa-solid fa-palette mr-1.5"></i>13 tema warna</span>
+                            <span class="px-3 py-2 rounded-full bg-white/15 border border-white/20"><i class="fa-solid fa-seedling mr-1.5"></i>Kategori sawah</span>
+                        </div>
+                    </div>
+                    <div class="hero-market-visual" aria-hidden="true">
+                        <div class="hero-visual-shell">
+                            <span class="hero-floating-tag tag-home"><i class="fa-solid fa-house"></i> Rumah</span>
+                            <span class="hero-floating-tag tag-field"><i class="fa-solid fa-seedling"></i> Sawah</span>
+                            <span class="hero-floating-tag tag-fast"><i class="fa-solid fa-car"></i> Mobil</span>
+                            <div class="hero-person-card seller">
+                                <div class="hero-avatar"><i class="fa-solid fa-shop"></i></div>
+                                <div>
+                                    <small>Penjual</small>
+                                    <b>Upload properti & barang dengan cepat</b>
+                                </div>
+                            </div>
+                            <div class="hero-scene-core">
+                                <div class="hero-store-front">
+                                    <div class="hero-store-icon"><i class="fa-solid fa-store"></i></div>
+                                </div>
+                            </div>
+                            <div class="hero-deal-chip"><i class="fa-solid fa-arrow-right-arrow-left"></i> Jual • Beli • Deal</div>
+                            <div class="hero-person-card buyer">
+                                <div class="hero-avatar"><i class="fa-solid fa-bag-shopping"></i></div>
+                                <div>
+                                    <small>Pembeli</small>
+                                    <b>Cari barang, rumah & sawah impian</b>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -434,6 +535,29 @@ body[data-theme="coffee-cream"] { --accent-600: #92400e; --accent-soft: #d6a86d;
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Background Web (Upload JPG/PNG)</label>
+                                <input type="file" id="set-page-bg" accept="image/png, image/jpeg" onchange="previewLocalBackground(event)" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-500 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700">
+                                <p class="text-[11px] text-slate-500 mt-1">Upload foto background agar tampilan lebih modern. Bisa dikosongkan jika ingin memakai gradien tema saja.</p>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Mode Background</label>
+                                <select id="set-background-mode" onchange="previewBackgroundMode(this.value)" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500">
+                                    <option value="gradient">Gradien Tema Saja</option>
+                                    <option value="photo-soft">Foto + Overlay Lembut</option>
+                                    <option value="photo-bold">Foto Lebih Jelas</option>
+                                </select>
+                                <label class="mt-3 inline-flex items-center gap-2 text-xs font-semibold text-slate-600"><input type="checkbox" id="set-clear-page-bg" class="rounded border-slate-300"> Hapus background foto</label>
+                            </div>
+                        </div>
+                        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-3 space-y-2">
+                            <div class="flex items-center justify-between gap-2 flex-wrap">
+                                <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Preview Background</span>
+                                <span class="text-[11px] text-slate-500">Semua tema tetap bisa dipakai pada preview ini</span>
+                            </div>
+                            <div id="page-background-preview" class="background-preview-box"><div>Pratinjau background website</div></div>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
                                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Pilihan Template Tampilan</label>
                                 <select id="set-template" onchange="previewThemeSelection(this.value)" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500">
                                     <option value="modern-blue">Biru Modern</option>
@@ -532,7 +656,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const DEFAULT_SETTINGS = { webTitle:'DODOLAN', adminName:'Admin Riyan', adminPhoto:'https://placehold.co/100x100/0284c7/ffffff?text=Riyan', webLogo:'', template:'modern-blue', animation:'pulse' };
+const DEFAULT_SETTINGS = { webTitle:'DODOLAN', adminName:'Admin Riyan', adminPhoto:'https://placehold.co/100x100/0284c7/ffffff?text=Riyan', webLogo:'', template:'modern-blue', animation:'pulse', pageBackground:'', backgroundMode:'gradient' };
 const CATEGORIES = ['Rumah','Tanah','Sawah','Mobil','Sepeda Motor','Elektronik'];
 const THEME_PALETTES = [
   {id:'modern-blue', name:'Biru Modern', colors:['#2563eb','#38bdf8','#164e9b']},
@@ -584,6 +708,33 @@ const esc = s => String(s??'').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;
 const money = v => 'Rp ' + Number(v||0).toLocaleString('id-ID');
 const safeId = id => /^[A-Za-z0-9_-]{1,80}$/.test(String(id)) ? String(id) : '';
 const imageUrl = url => typeof url==='string' && (url.startsWith('https://') || /^data:image\/(webp|png|jpeg);base64,/i.test(url)) ? esc(url) : 'https://placehold.co/600x400/0284c7/ffffff?text=DODOLAN';
+const cssUrlImage = url => imageUrl(url).replace(/"/g,'%22');
+function renderBackgroundPreview(url=settings.pageBackground||''){
+  const box=$('page-background-preview');
+  if(!box) return;
+  box.style.backgroundImage = url ? `linear-gradient(135deg, rgba(15,23,42,.18), rgba(15,23,42,.18)), url("${cssUrlImage(url)}")` : 'linear-gradient(135deg,var(--bg-a,#164e9b),var(--bg-b,#3730a3),var(--bg-c,#1d4ed8))';
+  box.innerHTML = `<div>${url ? 'Background custom aktif' : 'Pratinjau gradien tema aktif'}</div>`;
+}
+function previewBackgroundMode(mode){
+  document.body.dataset.bgmode=['gradient','photo-soft','photo-bold'].includes(mode)?mode:'gradient';
+  renderBackgroundPreview(($('set-clear-page-bg')?.checked)?'':(($('set-page-bg')?.files?.length)?settings.pageBackground||'':settings.pageBackground||''));
+}
+async function previewLocalBackground(event){
+  const file=event?.target?.files?.[0];
+  if(!file){
+    document.body.style.setProperty('--page-bg-image', settings.pageBackground ? `url("${cssUrlImage(settings.pageBackground)}")` : 'none');
+    renderBackgroundPreview(settings.pageBackground||'');
+    return;
+  }
+  try {
+    const data = await fileToSmallDataUrl(file, 120000, 1500);
+    document.body.style.setProperty('--page-bg-image', `url("${cssUrlImage(data)}")`);
+    renderBackgroundPreview(data);
+  } catch (e) {
+    console.error(e);
+    showToast('Preview background gagal dimuat.','error');
+  }
+}
 
 function showToast(message, type='success') {
   const container = $('toast-container');
@@ -615,6 +766,9 @@ function applySettingsToUI(){
   $('admin-welcome-name').textContent=`Halo, ${settings.adminName}`;
   document.body.dataset.theme=safeThemeName(settings.template);
   document.body.dataset.animation=['pulse','bounce','none'].includes(settings.animation)?settings.animation:'pulse';
+  document.body.dataset.bgmode=['gradient','photo-soft','photo-bold'].includes(settings.backgroundMode)?settings.backgroundMode:'gradient';
+  document.body.style.setProperty('--page-bg-image', settings.pageBackground ? `url("${cssUrlImage(settings.pageBackground)}")` : 'none');
+  renderBackgroundPreview(settings.pageBackground||'');
 }
 function filterCategory(cat){
   currentFilter=cat;
@@ -812,20 +966,27 @@ function loadSettingsToForm(){
   $('set-web-title').value=settings.webTitle;
   $('set-template').value=safeThemeName(settings.template);
   $('set-animation').value=['pulse','bounce','none'].includes(settings.animation)?settings.animation:'pulse';
+  $('set-background-mode').value=['gradient','photo-soft','photo-bold'].includes(settings.backgroundMode)?settings.backgroundMode:'gradient';
+  if($('set-clear-page-bg')) $('set-clear-page-bg').checked=false;
+  if($('set-page-bg')) $('set-page-bg').value='';
   renderThemePreviews();
   const status=$('theme-preview-status');
   if(status)status.textContent='Tema tersimpan: '+(THEME_PALETTES.find(t=>t.id===safeThemeName(settings.template))?.name||'Biru Modern')+'. Pilih tema lain untuk pratinjau.';
+  renderBackgroundPreview(settings.pageBackground||'');
+  previewBackgroundMode($('set-background-mode').value);
   updateProductDescriptionHint();
 }
 async function handleSaveSettings(event){
   event.preventDefault();if(!currentAdmin)return;
-  const next={...settings,adminName:$('set-admin-name').value.trim().slice(0,70),webTitle:$('set-web-title').value.trim().slice(0,45),template:safeThemeName($('set-template').value),animation:$('set-animation').value};
+  const next={...settings,adminName:$('set-admin-name').value.trim().slice(0,70),webTitle:$('set-web-title').value.trim().slice(0,45),template:safeThemeName($('set-template').value),animation:$('set-animation').value,backgroundMode:['gradient','photo-soft','photo-bold'].includes($('set-background-mode').value)?$('set-background-mode').value:'gradient'};
   if(!next.adminName||!next.webTitle)return showToast('Isi nama admin dan nama website.','error');
   const btn=event.target.querySelector('button[type="submit"]');btn.disabled=true;
   try{
-    const adminPhoto=$('set-admin-photo').files[0],logo=$('set-web-logo').files[0];
+    const adminPhoto=$('set-admin-photo').files[0],logo=$('set-web-logo').files[0],pageBg=$('set-page-bg').files[0];
     if(adminPhoto)next.adminPhoto=await fileToSmallDataUrl(adminPhoto,55000,450);
     if(logo)next.webLogo=await fileToSmallDataUrl(logo,55000,450);
+    if($('set-clear-page-bg')?.checked) next.pageBackground='';
+    if(pageBg) next.pageBackground=await fileToSmallDataUrl(pageBg,120000,1500);
     await setDoc(doc(db,'siteConfig','public'),next);
     showToast('Pengaturan website tersimpan online.');
   }catch(e){console.error(e);showToast('Gagal menyimpan pengaturan.','error');}
@@ -906,7 +1067,7 @@ onAuthStateChanged(auth,async user=>{
   transactions=[];updateAdminGuestNav();if(currentView==='admin')switchView('catalog');
 });
 applySettingsToUI();updateAdminGuestNav();renderCatalog();updateProductDescriptionHint();
-Object.assign(window,{switchView,filterCategory,handleSearch,viewProductDetail,setPreviewImage,openCheckoutModal,closeCheckoutModal,handleCheckoutSubmit,handleLoginSubmit,handleLogout,handleFileSelect,handleAddProduct,toggleProductStatus,deleteProduct,approveOrder,rejectOrder,renderAdminProducts,renderAdminTransactions,clearTransactions,switchAdminTab,handleSaveSettings,importLegacyData,chooseTheme,previewThemeSelection,previewAnimationSelection,updateProductDescriptionHint});
+Object.assign(window,{switchView,filterCategory,handleSearch,viewProductDetail,setPreviewImage,openCheckoutModal,closeCheckoutModal,handleCheckoutSubmit,handleLoginSubmit,handleLogout,handleFileSelect,handleAddProduct,toggleProductStatus,deleteProduct,approveOrder,rejectOrder,renderAdminProducts,renderAdminTransactions,clearTransactions,switchAdminTab,handleSaveSettings,importLegacyData,chooseTheme,previewThemeSelection,previewAnimationSelection,previewBackgroundMode,previewLocalBackground,updateProductDescriptionHint});
 
     </script>
 </body>
