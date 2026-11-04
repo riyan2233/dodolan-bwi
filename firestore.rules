@@ -1,0 +1,101 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Admin access is granted ONLY by a console-created document:
+    // admins/<FIREBASE_AUTH_UID>  with boolean field  active = true
+    function isAdmin() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+        && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.active == true;
+    }
+
+    match /admins/{uid} {
+      allow get: if request.auth != null && request.auth.uid == uid;
+      allow list, create, update, delete: if false;
+    }
+
+    function validImageList(images) {
+      return images is list && images.size() >= 1 && images.size() <= 4
+        && images[0] is string && images[0].size() <= 110000
+        && (images.size() < 2 || (images[1] is string && images[1].size() <= 110000))
+        && (images.size() < 3 || (images[2] is string && images[2].size() <= 110000))
+        && (images.size() < 4 || (images[3] is string && images[3].size() <= 110000));
+    }
+    function validProduct() {
+      let d = request.resource.data;
+      return d.keys().hasOnly(['name', 'category', 'price', 'status', 'desc', 'images', 'createdAt'])
+        && d.keys().hasAll(['name', 'category', 'price', 'status', 'desc', 'images'])
+        && d.name is string && d.name.size() > 0 && d.name.size() <= 110
+        && d.category in ['Rumah', 'Tanah', 'Sawah', 'Mobil', 'Sepeda Motor', 'Elektronik']
+        && d.price is int && d.price > 0 && d.price <= 10000000000000
+        && d.status in ['TERSEDIA', 'TERJUAL']
+        && d.desc is string && d.desc.size() > 0 && d.desc.size() <= 4000
+        && validImageList(d.images);
+    }
+    match /products/{productId} {
+      allow get, list: if true;
+      allow create, update: if isAdmin() && validProduct();
+      allow delete: if isAdmin();
+    }
+
+    // Pengaturan website hanya dapat ditulis admin.
+    // Tambahan dibanding versi lama: 13 tema, background, nomor WhatsApp.
+    function validSiteConfig() {
+      let d = request.resource.data;
+      return d.keys().hasOnly([
+          'webTitle', 'adminName', 'adminPhoto', 'webLogo',
+          'template', 'animation', 'adminWhatsapp', 'backgroundMode', 'pageBackground'
+        ])
+        && d.keys().hasAll(['webTitle', 'adminName', 'adminPhoto', 'webLogo', 'template', 'animation'])
+        && d.webTitle is string && d.webTitle.size() > 0 && d.webTitle.size() <= 45
+        && d.adminName is string && d.adminName.size() > 0 && d.adminName.size() <= 70
+        && d.adminPhoto is string && d.adminPhoto.size() <= 65000
+        && d.webLogo is string && d.webLogo.size() <= 65000
+        && d.template in [
+          'modern-blue', 'ocean-deep', 'sky-light', 'emerald-fresh',
+          'forest-green', 'sunset-orange', 'rose-elegant', 'ruby-red',
+          'purple-luxe', 'midnight-gold', 'teal-modern',
+          'graphite-silver', 'coffee-cream'
+        ]
+        && d.animation in ['pulse', 'bounce', 'none']
+        && d.get('adminWhatsapp', '') is string
+        && d.get('adminWhatsapp', '').size() <= 22
+        && d.get('backgroundMode', 'gradient') in ['gradient', 'photo-soft', 'photo-bold']
+        && d.get('pageBackground', '') is string
+        && d.get('pageBackground', '').size() <= 115000;
+    }
+    match /siteConfig/{configId} {
+      allow get: if configId == 'public';
+      allow list: if false;
+      allow create, update: if configId == 'public' && isAdmin() && validSiteConfig();
+      allow delete: if false;
+    }
+
+    function validNewOrder() {
+      let d = request.resource.data;
+      return d.keys().hasOnly(['productId','productName','category','price','buyerName','buyerPhone','buyerNote','date','status','createdAt'])
+        && d.keys().hasAll(['productId','productName','category','price','buyerName','buyerPhone','buyerNote','date','status','createdAt'])
+        && d.productId is string && d.productId.size() > 0 && d.productId.size() <= 80
+        && d.productName is string && d.productName.size() > 0 && d.productName.size() <= 110
+        && d.category in ['Rumah', 'Tanah', 'Sawah', 'Mobil', 'Sepeda Motor', 'Elektronik']
+        && d.price is int && d.price > 0 && d.price <= 10000000000000
+        && d.buyerName is string && d.buyerName.size() >= 2 && d.buyerName.size() <= 80
+        && d.buyerPhone is string && d.buyerPhone.matches('^[0-9+() -]{8,24}$')
+        && d.buyerNote is string && d.buyerNote.size() <= 500
+        && d.date is string && d.date.size() <= 50
+        && d.status == 'MENUNGGU'
+        && d.createdAt == request.time
+        && exists(/databases/$(database)/documents/products/$(d.productId))
+        && get(/databases/$(database)/documents/products/$(d.productId)).data.status == 'TERSEDIA'
+        && get(/databases/$(database)/documents/products/$(d.productId)).data.name == d.productName
+        && get(/databases/$(database)/documents/products/$(d.productId)).data.category == d.category
+        && get(/databases/$(database)/documents/products/$(d.productId)).data.price == d.price;
+    }
+    match /orders/{orderId} {
+      allow create: if isAdmin() || validNewOrder(); // Visitors submit validated orders; admins can import legacy receipts
+      allow get, list, update, delete: if isAdmin(); // Buyer info protected
+    }
+
+    match /{document=**} { allow read, write: if false; }
+  }
+}
