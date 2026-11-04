@@ -64,6 +64,11 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #94a3b8;
         }
+        html,body {max-width:100%;overflow-x:hidden}
+        #checkout-modal {overflow-y:auto;align-items:flex-start;padding-top:max(1rem,env(safe-area-inset-top));padding-bottom:max(1rem,env(safe-area-inset-bottom))}
+        #checkout-modal > div {max-height:calc(100dvh - 2rem);overflow-y:auto}
+        #product-grid > * {min-width:0}
+        @media(max-width:640px) {#main-header > div {height:4.3rem;padding-inline:12px} #logo-container {width:42px;height:42px} #brand-title {font-size:1.22rem} main {padding-top:1rem!important;padding-inline:12px!important} #view-catalog > div:first-child {padding:1.35rem} #view-catalog h1 {font-size:1.55rem} #product-grid {grid-template-columns:repeat(2,minmax(0,1fr));gap:10px} #product-grid article > div:first-child {height:132px} #product-grid article > div:last-child {padding:11px;gap:9px} #product-grid article h3 {font-size:13px} #product-grid article span.text-base {font-size:12px} #product-grid article button {padding:7px 10px} #view-admin .rounded-3xl {border-radius:17px} #view-admin .p-6 {padding:16px} #view-login {padding-top:22px} #view-login > div {padding:21px} .category-btn {padding:8px 10px} }
     </style>
 </head>
 <body class="h-full bg-gradient-to-br from-sky-900 via-blue-800 to-indigo-900 text-slate-800 font-sans antialiased flex flex-col justify-between selection:bg-blue-500 selection:text-white">
@@ -160,22 +165,22 @@
                         <i class="fa-solid fa-user-shield"></i>
                     </div>
                     <h2 class="text-2xl font-black text-slate-800">Login Admin</h2>
-                    <p class="text-xs text-slate-500">Masuk untuk mengelola produk, tema, dan melihat nota penjualan.</p>
+                    <p class="text-xs text-slate-500">Masuk menggunakan akun Firebase untuk mengelola produk dan pesanan.</p>
                 </div>
                 <form onsubmit="handleLoginSubmit(event)" class="space-y-4">
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Username Admin</label>
-                        <input type="text" id="login-user" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="admin">
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Email Admin Firebase</label>
+                        <input type="email" id="login-user" autocomplete="username" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="email@contoh.com">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Password</label>
-                        <input type="password" id="login-pass" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="••••••••">
+                        <input type="password" id="login-pass" autocomplete="current-password" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="••••••••">
                     </div>
                     <button type="submit" class="w-full py-3 bg-gradient-to-r from-blue-600 to-sky-500 hover:from-blue-700 hover:to-sky-600 text-white font-bold rounded-xl shadow-lg shadow-blue-500/30 transition">
                         Masuk Dashboard
                     </button>
                     <div class="text-center">
-                        <p class="text-xs text-slate-400">Default: <span class="font-semibold text-slate-600">admin</span> / <span class="font-semibold text-slate-600">riyan123</span></p>
+                        <p class="text-xs text-slate-400">Gunakan akun Email/Password Firebase yang sudah diberi akses admin.</p>
                     </div>
                 </form>
             </div>
@@ -194,9 +199,9 @@
                     </div>
                 </div>
                 <div class="flex flex-wrap gap-2">
-                    <button onclick="switchAdminTab('products')" class="admin-tab-btn px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 text-white shadow transition"><i class="fa-solid fa-box mr-1.5"></i> Kelola Produk</button>
-                    <button onclick="switchAdminTab('transactions')" class="admin-tab-btn px-4 py-2 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-blue-50 transition"><i class="fa-solid fa-receipt mr-1.5"></i> Histori & Nota</button>
-                    <button onclick="switchAdminTab('settings')" class="admin-tab-btn px-4 py-2 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-blue-50 transition"><i class="fa-solid fa-gear mr-1.5"></i> Pengaturan Web</button>
+                    <button onclick="switchAdminTab('products',this)" class="admin-tab-btn px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 text-white shadow transition"><i class="fa-solid fa-box mr-1.5"></i> Kelola Produk</button>
+                    <button onclick="switchAdminTab('transactions',this)" class="admin-tab-btn px-4 py-2 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-blue-50 transition"><i class="fa-solid fa-receipt mr-1.5"></i> Histori & Nota</button>
+                    <button onclick="switchAdminTab('settings',this)" class="admin-tab-btn px-4 py-2 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-blue-50 transition"><i class="fa-solid fa-gear mr-1.5"></i> Pengaturan Web</button>
                     <button onclick="handleLogout()" class="px-4 py-2 rounded-xl text-xs font-bold bg-rose-50 text-rose-600 hover:bg-rose-100 transition"><i class="fa-solid fa-right-from-bracket mr-1.5"></i> Logout</button>
                 </div>
             </div>
@@ -255,10 +260,10 @@
                 <div class="bg-white/95 backdrop-blur-md p-6 rounded-3xl shadow-xl border border-blue-100 space-y-4">
                     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                         <div>
-                            <h3 class="text-lg font-bold text-slate-800 flex items-center"><i class="fa-solid fa-receipt text-blue-600 mr-2"></i> Histori & Nota Penjualan (Khusus Admin)</h3>
-                            <p class="text-xs text-slate-500">Catatan transaksi penjualan barang yang hanya dapat dilihat oleh admin.</p>
+                            <h3 class="text-lg font-bold text-slate-800 flex items-center"><i class="fa-solid fa-receipt text-blue-600 mr-2"></i> Pesanan & Nota (Khusus Admin)</h3>
+                            <p class="text-xs text-slate-500">Pesanan masuk perlu dikonfirmasi admin. Data pembeli hanya dapat dibaca admin.</p>
                         </div>
-                        <button onclick="clearTransactions()" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-bold rounded-xl transition"><i class="fa-solid fa-trash mr-1"></i> Bersihkan Histori</button>
+                        <span class="text-xs text-slate-500">Penyimpanan aman di Firebase</span>
                     </div>
                     <div id="admin-transaction-list" class="space-y-4">
                         <!-- Terisi dinamis -->
@@ -308,6 +313,7 @@
                         </div>
                         <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg transition">Simpan Pengaturan</button>
                     </form>
+                    <div class="border-t border-blue-100 pt-4 space-y-2"><h4 class="text-sm font-bold">Pindahkan produk versi lama</h4><p class="text-xs text-slate-500">Jika sebelumnya menambah produk pada browser yang sama, impor secara manual ke Firestore. Data online tidak dihapus.</p><button onclick="importLegacyData()" class="px-4 py-2 text-sm bg-blue-100 text-blue-800 rounded-xl font-semibold">Impor data lama dari browser ini</button></div>
                 </div>
             </div>
         </section>
@@ -325,7 +331,7 @@
     <div id="checkout-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 animate-fade-in">
         <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
             <div class="flex items-center justify-between">
-                <h3 class="text-lg font-bold text-slate-800">Form Pembelian Produk</h3>
+                <h3 class="text-lg font-bold text-slate-800">Form Pemesanan Produk</h3>
                 <button onclick="closeCheckoutModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <div id="checkout-product-info" class="bg-blue-50 p-3 rounded-2xl flex items-center space-x-3">
@@ -345,622 +351,322 @@
                     <label class="block text-xs font-bold text-slate-700 mb-1">Catatan / Alamat Pengiriman</label>
                     <textarea id="buyer-note" rows="2" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500" placeholder="Catatan opsional..."></textarea>
                 </div>
-                <button type="submit" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md transition">Konfirmasi Pembelian & Buat Nota</button>
+                <button type="submit" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md transition">Kirim Pesanan ke Admin</button>
             </form>
         </div>
     </div>
 
-    <!-- MAIN JAVASCRIPT APP LOGIC -->
-    <script>
-        // --- DATA STORE INITIALIZATION ---
-        const DEFAULT_SETTINGS = {
-            webTitle: 'DODOLAN',
-            adminName: 'Admin Riyan',
-            adminPhoto: 'https://placehold.co/100x100/0284c7/ffffff?text=Riyan',
-            webLogo: '',
-            template: 'modern-blue',
-            animation: 'pulse'
-        };
+    <!-- Firebase Online - DODOLAN -->
+    <script type="module">
+// DODOLAN Firebase Online — single-page frontend, Firebase modular SDK
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js';
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js';
+import { getFirestore, collection, doc, getDoc, onSnapshot, addDoc, setDoc, updateDoc, deleteDoc, writeBatch, serverTimestamp } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js';
 
-        const DEFAULT_PRODUCTS = [
-            {
-                id: 1,
-                name: 'Rumah Minimalis Modern Type 45/90',
-                category: 'Rumah',
-                price: 450000000,
-                status: 'TERSEDIA',
-                desc: 'Rumah strategis siap huni di pusat kota dekat stasiun dan pusat perbelanjaan. 2 Kamar tidur, 1 kamar mandi, carport luas.',
-                images: [
-                    'https://placehold.co/600x400/0284c7/ffffff?text=Rumah+1',
-                    'https://placehold.co/600x400/0369a1/ffffff?text=Rumah+2',
-                    'https://placehold.co/600x400/0284c7/ffffff?text=Rumah+3',
-                    'https://placehold.co/600x400/035388/ffffff?text=Rumah+4'
-                ]
-            },
-            {
-                id: 2,
-                name: 'Tanah Kavling Siap Bangun 200m²',
-                category: 'Tanah',
-                price: 150000000,
-                status: 'TERSEDIA',
-                desc: 'Tanah matang SHM menghadap timur. Akses jalan lebar paving block, lingkungan asri dan bebas banjir.',
-                images: [
-                    'https://placehold.co/600x400/0284c7/ffffff?text=Tanah+1',
-                    'https://placehold.co/600x400/0369a1/ffffff?text=Tanah+2'
-                ]
-            },
-            {
-                id: 3,
-                name: 'Mobil SUV Keluarga Tahun 2022',
-                category: 'Mobil',
-                price: 235000000,
-                status: 'TERSEDIA',
-                desc: 'Kondisi mulus tangan pertama dari baru. Pajak panjang, servis rutin bengkel resmi, interior bersih wangi.',
-                images: [
-                    'https://placehold.co/600x400/0284c7/ffffff?text=Mobil+1',
-                    'https://placehold.co/600x400/0369a1/ffffff?text=Mobil+2',
-                    'https://placehold.co/600x400/0284c7/ffffff?text=Mobil+3'
-                ]
-            },
-            {
-                id: 4,
-                name: 'Sepeda Motor Matic Premium 160cc',
-                category: 'Sepeda Motor',
-                price: 28500000,
-                status: 'TERJUAL',
-                desc: 'Motor matic injeksi bertenaga tinggi, KM rendah, surat lengkap BPKB & STNK akurat.',
-                images: [
-                    'https://placehold.co/600x400/0284c7/ffffff?text=Motor+1',
-                    'https://placehold.co/600x400/0369a1/ffffff?text=Motor+2'
-                ]
-            },
-            {
-                id: 5,
-                name: 'Laptop Gaming Core i7 RTX 4060',
-                category: 'Elektronik',
-                price: 14500000,
-                status: 'TERSEDIA',
-                desc: 'Laptop performa tinggi untuk gaming dan editing video berat. Layar 144Hz, RAM 16GB NVMe 512GB.',
-                images: [
-                    'https://placehold.co/600x400/0284c7/ffffff?text=Elektronik+1',
-                    'https://placehold.co/600x400/0369a1/ffffff?text=Elektronik+2'
-                ]
-            }
-        ];
+const firebaseConfig = {
+  apiKey: 'AIzaSyBdPL63RH80eH6Q0bALYwZT8Miq3AI8shk',
+  authDomain: 'dodolan-bwi.firebaseapp.com',
+  projectId: 'dodolan-bwi',
+  storageBucket: 'dodolan-bwi.firebasestorage.app',
+  messagingSenderId: '1015535772241',
+  appId: '1:1015535772241:web:fc3b5c33e16491f627ce70',
+  measurementId: 'G-DN5CT21GSD'
+};
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const DEFAULT_SETTINGS = { webTitle:'DODOLAN', adminName:'Admin Riyan', adminPhoto:'https://placehold.co/100x100/0284c7/ffffff?text=Riyan', webLogo:'', template:'modern-blue', animation:'pulse' };
+const CATEGORIES = ['Rumah','Tanah','Mobil','Sepeda Motor','Elektronik'];
+let settings = {...DEFAULT_SETTINGS}, products=[], transactions=[], currentAdmin=null,
+    currentFilter='ALL', currentSearchQuery='', temporaryUploadedImages=[], pendingFileConversion=false,
+    unsubscribeOrders=null, currentView='catalog', productsLoaded=false;
+const $ = id => document.getElementById(id);
+const esc = s => String(s??'').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+const money = v => 'Rp ' + Number(v||0).toLocaleString('id-ID');
+const safeId = id => /^[A-Za-z0-9_-]{1,80}$/.test(String(id)) ? String(id) : '';
+const imageUrl = url => typeof url==='string' && (url.startsWith('https://') || /^data:image\/(webp|png|jpeg);base64,/i.test(url)) ? esc(url) : 'https://placehold.co/600x400/0284c7/ffffff?text=DODOLAN';
 
-        // Load or Init State
-        let settings = JSON.parse(localStorage.getItem('dodolan_settings')) || DEFAULT_SETTINGS;
-        let products = JSON.parse(localStorage.getItem('dodolan_products')) || DEFAULT_PRODUCTS;
-        let transactions = JSON.parse(localStorage.getItem('dodolan_transactions')) || [];
-        let currentAdmin = JSON.parse(localStorage.getItem('dodolan_admin_logged')) || null;
-        let currentFilter = 'ALL';
-        let currentSearchQuery = '';
-        let temporaryUploadedImages = []; // base64 array max 4
+function showToast(message, type='success') {
+  const container = $('toast-container');
+  if (!container) return;
+  const toast=document.createElement('div');
+  toast.className=`px-4 py-3 rounded-2xl shadow-xl text-white text-xs font-bold transition ${type==='success'?'bg-emerald-600':'bg-rose-600'}`;
+  toast.textContent=message;
+  container.appendChild(toast);
+  setTimeout(()=>toast.remove(),4000);
+}
+function switchView(name) {
+  if(name==='admin' && !currentAdmin) name='login';
+  currentView=name;
+  for(const item of ['catalog','detail','login','admin']) $('view-'+item).classList.toggle('hidden',item!==name);
+  if(name==='catalog') renderCatalog();
+  if(name==='admin'){renderAdminProducts();renderAdminTransactions();loadSettingsToForm();}
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function updateAdminGuestNav(){
+  $('admin-guest-nav').innerHTML=currentAdmin
+    ? `<button onclick="switchView('admin')" class="px-4 py-2 rounded-xl text-sm font-bold bg-blue-600 text-white shadow-md hover:bg-blue-700"><i class="fa-solid fa-gauge-high mr-1"></i><span class="hidden sm:inline">Admin Panel</span></button>`
+    : `<button onclick="switchView('login')" class="px-3 py-2 rounded-xl text-sm font-semibold text-slate-700 hover:bg-blue-50"><i class="fa-solid fa-lock text-blue-600 mr-1"></i><span>Login Admin</span></button>`;
+}
+function applySettingsToUI(){
+  $('page-title').textContent=`${settings.webTitle} - Marketplace by Riyan`;
+  $('brand-title').textContent=settings.webTitle;
+  $('logo-container').innerHTML=settings.webLogo ? `<img src="${imageUrl(settings.webLogo)}" alt="Logo" class="w-full h-full object-cover">` : '<i class="fa-solid fa-store text-xl"></i>';
+  $('admin-profile-preview-header').src=settings.adminPhoto||DEFAULT_SETTINGS.adminPhoto;
+  $('admin-welcome-name').textContent=`Halo, ${settings.adminName}`;
+}
+function filterCategory(cat){
+  currentFilter=cat;
+  document.querySelectorAll('.category-btn').forEach((btn,i)=>{
+    const chosen=(i===0?'ALL':CATEGORIES[i-1])===cat;
+    btn.className=`category-btn px-4 py-2 rounded-xl text-xs sm:text-sm transition whitespace-nowrap ${chosen?'font-bold bg-blue-600 text-white shadow-md':'font-semibold bg-slate-100 text-slate-700 hover:bg-blue-50'}`;
+  });
+  renderCatalog();
+}
+function handleSearch(){currentSearchQuery=$('search-input').value.toLowerCase();renderCatalog();}
+function renderCatalog(){
+  const grid=$('product-grid');
+  const filtered=products.filter(p=>(currentFilter==='ALL'||p.category===currentFilter) && (String(p.name||'').toLowerCase().includes(currentSearchQuery)||String(p.desc||'').toLowerCase().includes(currentSearchQuery)));
+  if(!filtered.length){
+    grid.innerHTML=`<div class="col-span-full py-14 text-center space-y-3 bg-white/95 rounded-3xl border border-blue-100 shadow-sm"><i class="fa-solid fa-box-open text-4xl text-slate-300"></i><p class="text-sm font-semibold text-slate-600">${productsLoaded?'Belum ada produk untuk kategori atau pencarian ini.':'Memuat katalog dari Firebase...'}</p>${currentAdmin?'<p class="text-xs text-slate-500">Buka Admin Panel untuk menambahkan produk.</p>':''}</div>`;
+    return;
+  }
+  grid.innerHTML=filtered.map(p=>{
+    const id=safeId(p.id),sold=p.status==='TERJUAL';
+    return `<article class="bg-white/95 backdrop-blur-md rounded-3xl shadow-xl overflow-hidden border border-blue-100 flex flex-col hover:shadow-2xl transition group animate-fade-in min-w-0">
+      <div class="relative h-52 overflow-hidden bg-slate-100 cursor-pointer" onclick="viewProductDetail('${id}')">
+        <img src="${imageUrl(p.images?.[0])}" alt="${esc(p.name)}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+        <span class="absolute top-3 left-3 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-extrabold text-blue-700 shadow uppercase">${esc(p.category)}</span>
+        ${sold?'<div class="absolute inset-0 bg-slate-900/60 flex items-center justify-center"><span class="px-4 py-2 bg-rose-600 text-white font-black text-lg rounded-xl -rotate-6">TERJUAL</span></div>':''}
+      </div><div class="p-5 space-y-3 flex-grow flex flex-col justify-between min-w-0"><div class="space-y-1 cursor-pointer" onclick="viewProductDetail('${id}')"><h3 class="font-bold text-slate-800 text-base line-clamp-2">${esc(p.name)}</h3><p class="text-xs text-slate-500 line-clamp-2">${esc(p.desc)}</p></div>
+      <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-2"><div class="min-w-0"><span class="text-[10px] text-slate-400 font-bold block">HARGA</span><span class="text-base font-extrabold text-blue-700 break-words">${money(p.price)}</span></div><button onclick="viewProductDetail('${id}')" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shrink-0">Detail</button></div></div></article>`;
+  }).join('');
+}
+function viewProductDetail(id){
+  const p=products.find(item=>String(item.id)===String(id));if(!p)return;
+  const sold=p.status==='TERJUAL';
+  const images=(Array.isArray(p.images)?p.images:[]);
+  const thumbs=images.length>1?`<div class="grid grid-cols-4 gap-2 mt-3">${images.map((img,i)=>`<button onclick="setPreviewImage('${safeId(p.id)}',${i})" aria-label="Foto ${i+1}"><img src="${imageUrl(img)}" class="w-full h-20 object-cover rounded-xl border-2 hover:border-blue-600" alt="Foto ${i+1}"></button>`).join('')}</div>`:'';
+  $('product-detail-container').innerHTML=`<div class="grid grid-cols-1 lg:grid-cols-2 gap-8"><div><img id="main-preview-img" src="${imageUrl(images[0])}" class="w-full h-72 sm:h-96 object-cover rounded-2xl shadow-lg" alt="${esc(p.name)}">${thumbs}</div>
+  <div class="space-y-6 flex flex-col justify-between"><div class="space-y-3"><div class="flex items-center gap-2 flex-wrap"><span class="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-extrabold rounded-full">${esc(p.category)}</span><span class="px-3 py-1 ${sold?'bg-rose-100 text-rose-700':'bg-emerald-100 text-emerald-700'} text-xs font-extrabold rounded-full">${esc(p.status)}</span></div>
+  <h2 class="text-2xl sm:text-3xl font-black text-slate-800">${esc(p.name)}</h2><div class="text-2xl font-black text-blue-700">${money(p.price)}</div><div class="pt-4 border-t border-slate-100"><h4 class="text-xs font-bold text-slate-400 mb-2">DESKRIPSI</h4><p class="text-sm text-slate-600 leading-relaxed whitespace-pre-line">${esc(p.desc)}</p></div></div>
+  ${sold?'<div class="w-full py-3 bg-slate-200 text-slate-500 font-bold rounded-xl text-center text-sm">Barang Sudah Terjual</div>':`<button onclick="openCheckoutModal('${safeId(p.id)}')" class="w-full py-3.5 bg-gradient-to-r from-blue-600 to-sky-500 text-white font-bold rounded-2xl shadow-lg"><i class="fa-solid fa-cart-shopping mr-2"></i> Pesan Sekarang</button>`}</div></div>`;
+  switchView('detail');
+}
+function setPreviewImage(id,index){const p=products.find(x=>x.id===id);if(p?.images?.[index])$('main-preview-img').src=p.images[index];}
+function openCheckoutModal(productId){
+  const p=products.find(x=>x.id===String(productId));if(!p||p.status!=='TERSEDIA')return;
+  $('checkout-prod-id').value=p.id;
+  $('checkout-product-info').innerHTML=`<img src="${imageUrl(p.images?.[0])}" class="w-16 h-16 object-cover rounded-xl" alt="Produk"><div><h4 class="font-bold text-sm text-slate-800 line-clamp-1">${esc(p.name)}</h4><span class="text-xs font-extrabold text-blue-700">${money(p.price)}</span></div>`;
+  $('checkout-modal').classList.remove('hidden');
+}
+function closeCheckoutModal(){$('checkout-modal').classList.add('hidden');}
+async function handleCheckoutSubmit(event){
+  event.preventDefault();
+  const id=$('checkout-prod-id').value,p=products.find(x=>x.id===id);
+  if(!p||p.status!=='TERSEDIA')return showToast('Produk tidak tersedia.','error');
+  const buyerName=$('buyer-name').value.trim(),buyerPhone=$('buyer-phone').value.trim(),buyerNote=$('buyer-note').value.trim();
+  if(buyerName.length<2||buyerName.length>80||!/^[0-9+() -]{8,24}$/.test(buyerPhone)||buyerNote.length>500)return showToast('Periksa nama, nomor HP, dan catatan.','error');
+  const submit=event.target.querySelector('button[type="submit"]');submit.disabled=true;submit.textContent='Mengirim pesanan...';
+  try{
+    await addDoc(collection(db,'orders'),{productId:p.id,productName:p.name,category:p.category,price:Number(p.price),buyerName,buyerPhone,buyerNote,date:new Date().toISOString(),status:'MENUNGGU',createdAt:serverTimestamp()});
+    closeCheckoutModal();event.target.reset();showToast('Pesanan terkirim! Admin akan mengonfirmasi pesanan.');
+  }catch(error){console.error(error);showToast('Pesanan gagal dikirim. Periksa koneksi/aturan Firestore.','error');}
+  finally{submit.disabled=false;submit.textContent='Kirim Pesanan ke Admin';}
+}
+async function handleLoginSubmit(event){
+  event.preventDefault();const email=$('login-user').value.trim(),password=$('login-pass').value;
+  const btn=event.target.querySelector('button[type="submit"]');btn.disabled=true;btn.textContent='Memeriksa akun...';
+  try{
+    const result=await signInWithEmailAndPassword(auth,email,password);
+    const adminSnap=await getDoc(doc(db,'admins',result.user.uid));
+    if(!adminSnap.exists()||adminSnap.data().active!==true){await signOut(auth);showToast('Akun belum diberi izin admin. Tambah admins/UID di Firestore.','error');return;}
+    showToast('Login Firebase berhasil!');
+  }catch(e){console.error(e);showToast('Login gagal. Periksa email/password dan pengaturan Firebase.','error');}
+  finally{btn.disabled=false;btn.textContent='Masuk Dashboard';$('login-pass').value='';}
+}
+async function handleLogout(){await signOut(auth);showToast('Berhasil keluar.');}
+function showImagePreviews(){
+  $('upload-preview-container').innerHTML=temporaryUploadedImages.map((url,i)=>`<img src="${imageUrl(url)}" alt="Foto ${i+1}" class="w-full h-16 object-cover rounded-xl border">`).join('');
+}
+// Resize locally to keep up to four photos inside one Firestore document (< 1 MiB).
+// The target 95,000 base64 characters per image is intentionally conservative.
+async function fileToSmallDataUrl(file,limit=95000,maxSide=1000){
+  if(!file.type.startsWith('image/')||file.size>15*1024*1024)throw Error('Gunakan foto JPG/PNG/WebP maksimal 15 MB.');
+  const url=URL.createObjectURL(file);
+  try{
+    const img=new Image();img.src=url;await img.decode();
+    let scale=Math.min(1,maxSide/Math.max(img.naturalWidth,img.naturalHeight));
+    for(let attempt=0;attempt<8;attempt++){
+      const canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(img.naturalWidth*scale));canvas.height=Math.max(1,Math.round(img.naturalHeight*scale));
+      canvas.getContext('2d',{alpha:false}).drawImage(img,0,0,canvas.width,canvas.height);
+      const quality=Math.max(.48,.78-attempt*.04),data=canvas.toDataURL('image/webp',quality);
+      if(data.startsWith('data:image/webp')&&data.length<=limit)return data;
+      scale*=.78;
+    }
+    throw Error('Foto terlalu rumit untuk disimpan. Coba foto lain.');
+  } finally {URL.revokeObjectURL(url);}
+}
+async function handleFileSelect(event){
+  const files=[...event.target.files];
+  if(files.length<1||files.length>4)return showToast('Pilih 1 hingga 4 foto.','error');
+  pendingFileConversion=true;temporaryUploadedImages=[];$('upload-preview-container').innerHTML='<span class="col-span-4 text-xs text-slate-500">Mengoptimalkan foto...</span>';
+  try{temporaryUploadedImages=await Promise.all(files.map(f=>fileToSmallDataUrl(f)));showImagePreviews();showToast('Foto siap diunggah ke Firestore.');}
+  catch(error){temporaryUploadedImages=[];event.target.value='';$('upload-preview-container').innerHTML='';showToast(error.message,'error');}
+  finally{pendingFileConversion=false;}
+}
+function validProduct(name,category,price,desc,images){return name.length>0&&name.length<=110&&CATEGORIES.includes(category)&&Number.isSafeInteger(price)&&price>0&&price<=10000000000000&&desc.length>0&&desc.length<=4000&&images.length>=1&&images.length<=4&&images.every(v=>typeof v==='string'&&v.length<=110000);}
+async function handleAddProduct(event){
+  event.preventDefault();if(!currentAdmin)return showToast('Login admin terlebih dahulu.','error');
+  if(pendingFileConversion)return showToast('Foto masih diproses.','error');
+  const name=$('prod-name').value.trim(),category=$('prod-cat').value,price=Number($('prod-price').value),desc=$('prod-desc').value.trim();
+  if(!validProduct(name,category,price,desc,temporaryUploadedImages))return showToast('Periksa nama, harga, deskripsi, dan 1–4 foto.','error');
+  const submit=event.target.querySelector('button[type="submit"]');submit.disabled=true;submit.textContent='Menyimpan...';
+  try{
+    const ref=doc(collection(db,'products'));
+    await setDoc(ref,{name,category,price,status:'TERSEDIA',desc,images:[...temporaryUploadedImages],createdAt:serverTimestamp()});
+    event.target.reset();temporaryUploadedImages=[];showImagePreviews();showToast('Produk berhasil tersimpan online!');
+  }catch(e){console.error(e);showToast('Gagal menyimpan produk. Periksa aturan Firestore.','error');}
+  finally{submit.disabled=false;submit.textContent='Simpan Produk';}
+}
+async function toggleProductStatus(id){
+  if(!currentAdmin||!safeId(id))return;
+  const p=products.find(x=>x.id===id);if(!p)return;
+  try{await updateDoc(doc(db,'products',id),{status:p.status==='TERSEDIA'?'TERJUAL':'TERSEDIA'});showToast('Status produk diperbarui online.');}
+  catch(e){console.error(e);showToast('Gagal mengubah status.','error');}
+}
+async function deleteProduct(id){
+  if(!currentAdmin||!safeId(id)||!confirm('Hapus produk ini dari semua perangkat?'))return;
+  try{await deleteDoc(doc(db,'products',id));showToast('Produk dihapus dari database.');}
+  catch(e){console.error(e);showToast('Gagal menghapus produk.','error');}
+}
+function renderAdminProducts(){
+  if(!currentAdmin)return;
+  $('admin-product-list').innerHTML=products.length?products.map(p=>`<div class="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-2xl gap-3"><div class="flex items-center space-x-3 min-w-0"><img src="${imageUrl(p.images?.[0])}" class="w-14 h-14 object-cover rounded-xl shrink-0" alt="Foto"><div class="min-w-0"><h4 class="font-bold text-sm text-slate-800 line-clamp-2">${esc(p.name)}</h4><div class="flex items-center gap-2 mt-0.5 flex-wrap"><span class="px-2 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-bold rounded">${esc(p.category)}</span><span class="px-2 py-0.5 ${p.status==='TERSEDIA'?'bg-emerald-100 text-emerald-700':'bg-rose-100 text-rose-700'} text-[10px] font-bold rounded">${esc(p.status)}</span></div><span class="text-xs font-bold text-blue-700">${money(p.price)}</span></div></div><div class="flex gap-2 shrink-0"><button onclick="toggleProductStatus('${safeId(p.id)}')" class="px-3 py-2 bg-amber-50 text-amber-700 rounded-xl" aria-label="Ubah status"><i class="fa-solid fa-rotate"></i></button><button onclick="deleteProduct('${safeId(p.id)}')" class="px-3 py-2 bg-rose-50 text-rose-600 rounded-xl" aria-label="Hapus"><i class="fa-solid fa-trash"></i></button></div></div>`).join(''):'<p class="text-xs text-slate-400 text-center py-4">Belum ada produk online.</p>';
+}
+function renderAdminTransactions(){
+  if(!currentAdmin)return;
+  const list=$('admin-transaction-list');
+  list.innerHTML=transactions.length?transactions.map(t=>`<article class="bg-slate-50 border border-slate-200 p-5 rounded-2xl space-y-3"><div class="flex items-center justify-between gap-2 flex-wrap border-b pb-3"><div><span class="text-xs font-extrabold text-blue-700">PESANAN ${esc(t.id.slice(0,8).toUpperCase())}</span><p class="text-[11px] text-slate-400">${esc(t.date?new Date(t.date).toLocaleString('id-ID'):'-')}</p></div><span class="px-3 py-1 ${t.status==='MENUNGGU'?'bg-amber-100 text-amber-800':t.status==='DITOLAK'?'bg-rose-100 text-rose-700':'bg-emerald-100 text-emerald-700'} text-xs font-bold rounded-xl">${esc(t.status)}</span></div><div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs"><div><b class="text-slate-500">BARANG</b><p class="font-bold">${esc(t.productName)}</p><p>${esc(t.category)}</p><p class="font-extrabold text-blue-700">${money(t.price)}</p></div><div><b class="text-slate-500">PEMBELI</b><p class="font-semibold">${esc(t.buyerName)} (${esc(t.buyerPhone)})</p><p class="italic">${esc(t.buyerNote||'-')}</p></div></div>${t.status==='MENUNGGU'?`<div class="flex flex-wrap gap-2"><button onclick="approveOrder('${safeId(t.id)}')" class="px-3 py-2 bg-emerald-600 text-white rounded-xl text-xs font-bold">Konfirmasi & tandai terjual</button><button onclick="rejectOrder('${safeId(t.id)}')" class="px-3 py-2 bg-rose-100 text-rose-700 rounded-xl text-xs font-bold">Tolak pesanan</button></div>`:''}</article>`).join(''):'<div class="text-center py-8 text-slate-400 text-xs">Belum ada pesanan masuk.</div>';
+}
+async function approveOrder(id){
+  if(!currentAdmin||!safeId(id))return;
+  const order=transactions.find(x=>x.id===id);
+  if(!order||order.status!=='MENUNGGU'||!confirm('Konfirmasi penjualan? Produk akan ditandai TERJUAL.'))return;
+  try{
+    const batch=writeBatch(db);
+    batch.update(doc(db,'orders',id),{status:'DISETUJUI'});
+    batch.update(doc(db,'products',order.productId),{status:'TERJUAL'});
+    await batch.commit();showToast('Pesanan dikonfirmasi dan produk ditandai TERJUAL.');
+  }catch(e){console.error(e);showToast('Gagal mengonfirmasi pesanan.','error');}
+}
+async function rejectOrder(id){
+  if(!currentAdmin||!safeId(id)||!confirm('Tolak pesanan ini?'))return;
+  try{await updateDoc(doc(db,'orders',id),{status:'DITOLAK'});showToast('Pesanan ditolak.');}
+  catch(e){console.error(e);showToast('Gagal menolak pesanan.','error');}
+}
+async function clearTransactions(){showToast('Penghapusan massal dinonaktifkan untuk mencegah hilangnya histori online.','error');}
+function switchAdminTab(tabName,button=null){
+  for(const tab of ['products','transactions','settings'])$('admin-tab-'+tab).classList.toggle('hidden',tab!==tabName);
+  document.querySelectorAll('.admin-tab-btn').forEach((btn,i)=>{const selected=['products','transactions','settings'][i]===tabName;btn.className=`admin-tab-btn px-4 py-2 rounded-xl text-xs font-bold transition ${selected?'bg-blue-600 text-white shadow':'bg-slate-100 text-slate-700 hover:bg-blue-50'}`;});
+}
+function loadSettingsToForm(){
+  $('set-admin-name').value=settings.adminName;
+  $('set-web-title').value=settings.webTitle;
+  $('set-template').value=settings.template;
+  $('set-animation').value=settings.animation;
+}
+async function handleSaveSettings(event){
+  event.preventDefault();if(!currentAdmin)return;
+  const next={...settings,adminName:$('set-admin-name').value.trim().slice(0,70),webTitle:$('set-web-title').value.trim().slice(0,45),template:$('set-template').value,animation:$('set-animation').value};
+  if(!next.adminName||!next.webTitle)return showToast('Isi nama admin dan nama website.','error');
+  const btn=event.target.querySelector('button[type="submit"]');btn.disabled=true;
+  try{
+    const adminPhoto=$('set-admin-photo').files[0],logo=$('set-web-logo').files[0];
+    if(adminPhoto)next.adminPhoto=await fileToSmallDataUrl(adminPhoto,55000,450);
+    if(logo)next.webLogo=await fileToSmallDataUrl(logo,55000,450);
+    await setDoc(doc(db,'siteConfig','public'),next);
+    showToast('Pengaturan website tersimpan online.');
+  }catch(e){console.error(e);showToast('Gagal menyimpan pengaturan.','error');}
+  finally{btn.disabled=false;}
+}
+// Optional migration for old browser-local data. Admin must confirm; do not silently overwrite Firebase.
+async function importLegacyData(){
+  if(!currentAdmin)return;
+  let oldProducts=[],oldTransactions=[],oldSettings=null;
+  try{oldProducts=JSON.parse(localStorage.getItem('dodolan_products')||'[]');oldTransactions=JSON.parse(localStorage.getItem('dodolan_transactions')||'[]');oldSettings=JSON.parse(localStorage.getItem('dodolan_settings')||'null');}catch{}
+  if(!Array.isArray(oldProducts))oldProducts=[];
+  if(!oldProducts.length&&!oldTransactions.length&&!oldSettings)return showToast('Tidak ada data lokal lama di browser ini.','error');
+  if(!confirm(`Impor ${oldProducts.length} produk dan ${oldTransactions.length} nota lama dari browser ini ke Firebase? Data online tidak dihapus.`))return;
+  let saved=0,failed=0;
+  for(const p of oldProducts){
+    try{
+      const images=[];
+      for(const img of (p.images||[]).slice(0,4)){
+        if(typeof img!=='string')continue;
+        if(/^data:image\//i.test(img)){
+          const blob=await(await fetch(img)).blob();
+          images.push(await fileToSmallDataUrl(new File([blob],'lama.png',{type:blob.type||'image/png'})));
+        }else if(img.startsWith('https://'))images.push(img.slice(0,110000));
+      }
+      const name=String(p.name||'').slice(0,110),category=p.category,desc=String(p.desc||'').slice(0,4000),price=Number(p.price);
+      if(!validProduct(name,category,price,desc,images))throw Error('Data produk tidak valid.');
+      await addDoc(collection(db,'products'),{name,category,price,status:p.status==='TERJUAL'?'TERJUAL':'TERSEDIA',desc,images,createdAt:serverTimestamp()});saved++;
+    }catch(e){console.error('Impor gagal',e);failed++;}
+  }
+  for(const t of (Array.isArray(oldTransactions)?oldTransactions:[])){
+    try{
+      const pName=String(t.productName||'').slice(0,110),cat=String(t.category||'');
+      if(!pName||!CATEGORIES.includes(cat))throw Error('Nota tidak lengkap');
+      await addDoc(collection(db,'orders'),{
+        productId:'legacy',productName:pName,category:cat,price:Number(t.price)||0,
+        buyerName:String(t.buyerName||'').slice(0,80),buyerPhone:String(t.buyerPhone||'').slice(0,24),buyerNote:String(t.buyerNote||'').slice(0,500),
+        date:new Date().toISOString(),status:'DISETUJUI',createdAt:serverTimestamp()
+      });saved++;
+    }catch(e){console.error('Impor nota gagal',e);failed++;}
+  }
+  if(oldSettings&&confirm('Impor pengaturan website lama juga?')){
+    try{
+      const next={...DEFAULT_SETTINGS,...oldSettings};
+      for(const k of ['adminPhoto','webLogo'])if(typeof next[k]==='string'&&next[k].startsWith('data:image/')){
+        const blob=await(await fetch(next[k])).blob();next[k]=await fileToSmallDataUrl(new File([blob],k+'.png',{type:blob.type||'image/png'}),55000,450);
+      }
+      await setDoc(doc(db,'siteConfig','public'),next);
+    }catch(e){console.error(e);failed++;}
+  }
+  showToast(`Impor selesai: ${saved} catatan berhasil, ${failed} gagal.`);
+}
+// Real-time public catalogue and site appearance (no admin session required).
+onSnapshot(collection(db,'products'),snap=>{
+  products=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+  productsLoaded=true;renderCatalog();if(currentAdmin)renderAdminProducts();
+  if(currentView==='detail')switchView('catalog');
+},error=>{console.error('Katalog Firestore',error);productsLoaded=true;renderCatalog();showToast('Katalog tidak dapat dimuat. Buat Firestore & publikasikan Rules.','error');});
+onSnapshot(doc(db,'siteConfig','public'),snap=>{
+  settings=snap.exists()?{...DEFAULT_SETTINGS,...snap.data()}:{...DEFAULT_SETTINGS};
+  applySettingsToUI();if(currentAdmin)loadSettingsToForm();
+},error=>{console.error('Pengaturan Firestore',error);showToast('Pengaturan website gagal dimuat.','error');});
+onAuthStateChanged(auth,async user=>{
+  currentAdmin=null;if(unsubscribeOrders){unsubscribeOrders();unsubscribeOrders=null;}
+  if(user){
+    try{
+      const adminDoc=await getDoc(doc(db,'admins',user.uid));
+      if(adminDoc.exists()&&adminDoc.data().active===true){
+        currentAdmin={uid:user.uid,email:user.email};
+        unsubscribeOrders=onSnapshot(collection(db,'orders'),snap=>{
+          transactions=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+          renderAdminTransactions();
+        },error=>{console.error(error);showToast('Tidak dapat membaca pesanan. Periksa Rules.','error');});
+        updateAdminGuestNav();if(currentView==='login')switchView('admin');return;
+      }
+      await signOut(auth);
+    }catch(e){console.error('Cek admin',e);showToast('Gagal memeriksa izin admin. Periksa dokumen admins/UID.','error');}
+  }
+  transactions=[];updateAdminGuestNav();if(currentView==='admin')switchView('catalog');
+});
+applySettingsToUI();updateAdminGuestNav();renderCatalog();
+Object.assign(window,{switchView,filterCategory,handleSearch,viewProductDetail,setPreviewImage,openCheckoutModal,closeCheckoutModal,handleCheckoutSubmit,handleLoginSubmit,handleLogout,handleFileSelect,handleAddProduct,toggleProductStatus,deleteProduct,approveOrder,rejectOrder,renderAdminProducts,renderAdminTransactions,clearTransactions,switchAdminTab,handleSaveSettings,importLegacyData});
 
-        // --- INIT ON LOAD ---
-        window.onload = function() {
-            applySettingsToUI();
-            renderCatalog();
-            updateAdminGuestNav();
-        };
-
-        // --- TOAST NOTIFICATION ---
-        function showToast(message, type = 'success') {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = `px-4 py-3 rounded-2xl shadow-xl text-white text-xs font-bold pointer-events-auto flex items-center space-x-2 transition transform translate-y-2 opacity-0 ${type === 'success' ? 'bg-emerald-600' : 'bg-rose-600'}`;
-            toast.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation'} text-sm"></i><span>${message}</span>`;
-            container.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.classList.remove('translate-y-2', 'opacity-0');
-            }, 50);
-
-            setTimeout(() => {
-                toast.classList.add('translate-y-2', 'opacity-0');
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
-        }
-
-        // --- VIEW ROUTING & NAVIGATION ---
-        function switchView(viewName) {
-            document.getElementById('view-catalog').classList.add('hidden');
-            document.getElementById('view-detail').classList.add('hidden');
-            document.getElementById('view-login').classList.add('hidden');
-            document.getElementById('view-admin').classList.add('hidden');
-
-            if (viewName === 'catalog') {
-                document.getElementById('view-catalog').classList.remove('hidden');
-                renderCatalog();
-            } else if (viewName === 'detail') {
-                document.getElementById('view-detail').classList.remove('hidden');
-            } else if (viewName === 'login') {
-                if (currentAdmin) {
-                    switchView('admin');
-                    return;
-                }
-                document.getElementById('view-login').classList.remove('hidden');
-            } else if (viewName === 'admin') {
-                if (!currentAdmin) {
-                    switchView('login');
-                    return;
-                }
-                document.getElementById('view-admin').classList.remove('hidden');
-                renderAdminProducts();
-                renderAdminTransactions();
-                loadSettingsToForm();
-            }
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function updateAdminGuestNav() {
-            const nav = document.getElementById('admin-guest-nav');
-            if (currentAdmin) {
-                nav.innerHTML = `
-                    <button onclick="switchView('admin')" class="px-4 py-2 rounded-xl text-sm font-bold bg-blue-600 text-white shadow-md shadow-blue-500/20 hover:bg-blue-700 transition flex items-center space-x-2">
-                        <i class="fa-solid fa-gauge-high"></i>
-                        <span class="hidden sm:inline">Admin Panel</span>
-                    </button>
-                `;
-            } else {
-                nav.innerHTML = `
-                    <button onclick="switchView('login')" class="px-4 py-2 rounded-xl text-sm font-semibold text-slate-700 hover:bg-blue-50 transition flex items-center space-x-2">
-                        <i class="fa-solid fa-lock text-blue-600"></i>
-                        <span>Login Admin</span>
-                    </button>
-                `;
-            }
-        }
-
-        // --- APPLY SETTINGS & THEME ---
-        function applySettingsToUI() {
-            document.getElementById('page-title').innerText = `${settings.webTitle} - Marketplace by Riyan`;
-            document.getElementById('brand-title').innerText = settings.webTitle;
-            
-            // Logo
-            const logoContainer = document.getElementById('logo-container');
-            if (settings.webLogo) {
-                logoContainer.innerHTML = `<img src="${settings.webLogo}" class="w-full h-full object-cover">`;
-            } else {
-                logoContainer.innerHTML = `<i class="fa-solid fa-store text-xl" id="logo-icon"></i>`;
-            }
-
-            // Admin Profile Preview in Header
-            const adminHeaderImg = document.getElementById('admin-profile-preview-header');
-            if (adminHeaderImg && settings.adminPhoto) {
-                adminHeaderImg.src = settings.adminPhoto;
-            }
-            const welcomeName = document.getElementById('admin-welcome-name');
-            if (welcomeName) {
-                welcomeName.innerText = `Halo, ${settings.adminName}`;
-            }
-        }
-
-        // --- CATALOG RENDERING & FILTERING ---
-        function filterCategory(cat) {
-            currentFilter = cat;
-            document.querySelectorAll('.category-btn').forEach(btn => {
-                btn.className = "category-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 text-slate-700 hover:bg-blue-50 transition whitespace-nowrap";
-                if (btn.innerText.includes(cat) || (cat === 'ALL' && btn.innerText === 'Semua')) {
-                    btn.className = "category-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-blue-600 text-white shadow-md shadow-blue-500/20 transition whitespace-nowrap";
-                }
-            });
-            renderCatalog();
-        }
-
-        function handleSearch() {
-            currentSearchQuery = document.getElementById('search-input').value.toLowerCase();
-            renderCatalog();
-        }
-
-        function renderCatalog() {
-            const grid = document.getElementById('product-grid');
-            let filtered = products.filter(p => {
-                const matchCat = (currentFilter === 'ALL' || p.category === currentFilter);
-                const matchSearch = p.name.toLowerCase().includes(currentSearchQuery) || p.desc.toLowerCase().includes(currentSearchQuery);
-                return matchCat && matchSearch;
-            });
-
-            if (filtered.length === 0) {
-                grid.innerHTML = `
-                    <div class="col-span-full py-16 text-center space-y-3 bg-white/95 rounded-3xl border border-blue-100 shadow-sm">
-                        <i class="fa-solid fa-box-open text-4xl text-slate-300"></i>
-                        <p class="text-sm font-semibold text-slate-600">Tidak ada produk yang ditemukan.</p>
-                    </div>
-                `;
-                return;
-            }
-
-            grid.innerHTML = filtered.map(p => {
-                const mainImg = p.images && p.images.length > 0 ? p.images[0] : 'https://placehold.co/600x400/0284c7/ffffff?text=No+Image';
-                const isSold = p.status === 'TERJUAL';
-                return `
-                    <div class="bg-white/95 backdrop-blur-md rounded-3xl shadow-xl overflow-hidden border border-blue-100 flex flex-col justify-between hover:shadow-2xl transition group animate-fade-in">
-                        <div class="relative h-52 overflow-hidden bg-slate-100 cursor-pointer" onclick="viewProductDetail(${p.id})">
-                            <img src="${mainImg}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                            <div class="absolute top-3 left-3 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-extrabold text-blue-700 shadow uppercase">
-                                ${p.category}
-                            </div>
-                            ${isSold ? `<div class="absolute inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center"><span class="px-4 py-2 bg-rose-600 text-white font-black text-lg tracking-wider rounded-xl uppercase shadow-lg transform -rotate-6">TERJUAL</span></div>` : ''}
-                        </div>
-                        <div class="p-5 space-y-3 flex-grow flex flex-col justify-between">
-                            <div class="space-y-1 cursor-pointer" onclick="viewProductDetail(${p.id})">
-                                <h3 class="font-bold text-slate-800 text-base line-clamp-1 group-hover:text-blue-600 transition">${p.name}</h3>
-                                <p class="text-xs text-slate-500 line-clamp-2">${p.desc}</p>
-                            </div>
-                            <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
-                                <div>
-                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Harga</span>
-                                    <span class="text-base font-extrabold text-blue-700">Rp ${Number(p.price).toLocaleString('id-ID')}</span>
-                                </div>
-                                <button onclick="viewProductDetail(${p.id})" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow transition">
-                                    Detail
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        // --- PRODUCT DETAIL VIEW ---
-        function viewProductDetail(id) {
-            const p = products.find(item => item.id === id);
-            if (!p) return;
-
-            const isSold = p.status === 'TERJUAL';
-            const detailContainer = document.getElementById('product-detail-container');
-            
-            let imagesHtml = '';
-            let thumbsHtml = '';
-            if (p.images && p.images.length > 0) {
-                imagesHtml = `<img id="main-preview-img" src="${p.images[0]}" class="w-full h-72 sm:h-96 object-cover rounded-2xl shadow-lg">`;
-                if (p.images.length > 1) {
-                    thumbsHtml = `<div class="grid grid-cols-4 gap-2 mt-3">` + p.images.map((img, idx) => `
-                        <img src="${img}" onclick="document.getElementById('main-preview-img').src='${img}'" class="w-full h-20 object-cover rounded-xl cursor-pointer border-2 hover:border-blue-600 transition">
-                    `).join('') + `</div>`;
-                }
-            }
-
-            detailContainer.innerHTML = `
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <div>
-                        ${imagesHtml}
-                        ${thumbsHtml}
-                    </div>
-                    <div class="space-y-6 flex flex-col justify-between">
-                        <div class="space-y-3">
-                            <div class="flex items-center space-x-2">
-                                <span class="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-extrabold rounded-full uppercase">${p.category}</span>
-                                <span class="px-3 py-1 ${isSold ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-700'} text-xs font-extrabold rounded-full uppercase">${p.status}</span>
-                            </div>
-                            <h2 class="text-2xl sm:text-3xl font-black text-slate-800">${p.name}</h2>
-                            <div class="text-2xl font-black text-blue-700">Rp ${Number(p.price).toLocaleString('id-ID')}</div>
-                            <div class="pt-4 border-t border-slate-100">
-                                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Deskripsi Lengkap</h4>
-                                <p class="text-sm text-slate-600 leading-relaxed whitespace-pre-line">${p.desc}</p>
-                            </div>
-                        </div>
-
-                        <div>
-                            ${isSold ? `
-                                <div class="w-full py-3 bg-slate-200 text-slate-500 font-bold rounded-xl text-center text-sm cursor-not-allowed">
-                                    Barang Sudah Terjual
-                                </div>
-                            ` : `
-                                <button onclick="openCheckoutModal(${p.id})" class="w-full py-3.5 bg-gradient-to-r from-blue-600 to-sky-500 hover:from-blue-700 hover:to-sky-600 text-white font-bold rounded-2xl shadow-lg shadow-blue-500/30 transition flex items-center justify-center space-x-2">
-                                    <i class="fa-solid fa-cart-shopping"></i>
-                                    <span>Beli / Pesan Sekarang</span>
-                                </button>
-                            `}
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            switchView('detail');
-        }
-
-        // --- CHECKOUT & TRANSACTION (Nota Penjualan) ---
-        function openCheckoutModal(productId) {
-            const p = products.find(item => item.id === productId);
-            if (!p) return;
-
-            document.getElementById('checkout-prod-id').value = p.id;
-            document.getElementById('checkout-product-info').innerHTML = `
-                <img src="${p.images[0]}" class="w-16 h-16 object-cover rounded-xl">
-                <div>
-                    <h4 class="font-bold text-sm text-slate-800 line-clamp-1">${p.name}</h4>
-                    <span class="text-xs font-extrabold text-blue-700">Rp ${Number(p.price).toLocaleString('id-ID')}</span>
-                </div>
-            `;
-            document.getElementById('checkout-modal').classList.remove('hidden');
-        }
-
-        function closeCheckoutModal() {
-            document.getElementById('checkout-modal').classList.add('hidden');
-        }
-
-        function handleCheckoutSubmit(event) {
-            event.preventDefault();
-            const prodId = Number(document.getElementById('checkout-prod-id').value);
-            const buyerName = document.getElementById('buyer-name').value;
-            const buyerPhone = document.getElementById('buyer-phone').value;
-            const buyerNote = document.getElementById('buyer-note').value;
-
-            const product = products.find(p => p.id === prodId);
-            if (!product) return;
-
-            // Set product status to TERJUAL
-            product.status = 'TERJUAL';
-            localStorage.setItem('dodolan_products', JSON.stringify(products));
-
-            // Create Transaction Record (Nota Penjualan)
-            const transaction = {
-                id: 'NOTA-' + Date.now().toString().slice(-6),
-                date: new Date().toLocaleString('id-ID'),
-                productName: product.name,
-                category: product.category,
-                price: product.price,
-                buyerName: buyerName,
-                buyerPhone: buyerPhone,
-                buyerNote: buyerNote
-            };
-
-            transactions.unshift(transaction);
-            localStorage.setItem('dodolan_transactions', JSON.stringify(transactions));
-
-            closeCheckoutModal();
-            showToast('Pembelian berhasil! Status produk kini TERJUAL.');
-            viewProductDetail(prodId);
-        }
-
-        // --- ADMIN AUTHENTICATION ---
-        function handleLoginSubmit(event) {
-            event.preventDefault();
-            const u = document.getElementById('login-user').value;
-            const p = document.getElementById('login-pass').value;
-
-            if (u === 'admin' && p === 'riyan123') {
-                currentAdmin = { username: 'admin', name: settings.adminName };
-                localStorage.setItem('dodolan_admin_logged', JSON.stringify(currentAdmin));
-                showToast('Login Admin Berhasil!');
-                updateAdminGuestNav();
-                switchView('admin');
-            } else {
-                showToast('Username atau Password salah! (admin / riyan123)', 'error');
-            }
-        }
-
-        function handleLogout() {
-            currentAdmin = null;
-            localStorage.removeItem('dodolan_admin_logged');
-            showToast('Logout berhasil.');
-            updateAdminGuestNav();
-            switchView('catalog');
-        }
-
-        // --- ADMIN PRODUCT MANAGEMENT ---
-        function handleFileSelect(event) {
-            const files = event.target.files;
-            if (files.length > 4) {
-                showToast('Maksimal hanya 4 foto yang dapat diunggah!', 'error');
-                event.target.value = '';
-                return;
-            }
-
-            temporaryUploadedImages = [];
-            const container = document.getElementById('upload-preview-container');
-            container.innerHTML = '';
-
-            for (let i = 0; i < files.length; i++) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    temporaryUploadedImages.push(e.target.result);
-                    container.innerHTML += `<img src="${e.target.result}" class="w-full h-16 object-cover rounded-xl border">`;
-                };
-                reader.readAsDataURL(files[i]);
-            }
-        }
-
-        function handleAddProduct(event) {
-            event.preventDefault();
-            const name = document.getElementById('prod-name').value;
-            const category = document.getElementById('prod-cat').value;
-            const price = Number(document.getElementById('prod-price').value);
-            const desc = document.getElementById('prod-desc').value;
-
-            if (temporaryUploadedImages.length === 0) {
-                showToast('Harap upload minimal 1 foto produk!', 'error');
-                return;
-            }
-
-            const newProduct = {
-                id: Date.now(),
-                name,
-                category,
-                price,
-                status: 'TERSEDIA',
-                desc,
-                images: [...temporaryUploadedImages]
-            };
-
-            products.unshift(newProduct);
-            localStorage.setItem('dodolan_products', JSON.stringify(products));
-
-            showToast('Produk berhasil ditambahkan!');
-            event.target.reset();
-            temporaryUploadedImages = [];
-            document.getElementById('upload-preview-container').innerHTML = '';
-            renderAdminProducts();
-        }
-
-        function toggleProductStatus(id) {
-            const p = products.find(item => item.id === id);
-            if (p) {
-                p.status = p.status === 'TERSEDIA' ? 'TERJUAL' : 'TERSEDIA';
-                localStorage.setItem('dodolan_products', JSON.stringify(products));
-                renderAdminProducts();
-                showToast(`Status produk diubah jadi ${p.status}`);
-            }
-        }
-
-        function deleteProduct(id) {
-            if (confirm('Yakin ingin menghapus produk ini?')) {
-                products = products.filter(item => item.id !== id);
-                localStorage.setItem('dodolan_products', JSON.stringify(products));
-                renderAdminProducts();
-                showToast('Produk berhasil dihapus.');
-            }
-        }
-
-        function renderAdminProducts() {
-            const list = document.getElementById('admin-product-list');
-            if (products.length === 0) {
-                list.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">Belum ada produk.</p>`;
-                return;
-            }
-
-            list.innerHTML = products.map(p => `
-                <div class="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-2xl gap-3">
-                    <div class="flex items-center space-x-3 overflow-hidden">
-                        <img src="${p.images[0]}" class="w-14 h-14 object-cover rounded-xl flex-shrink-0">
-                        <div class="overflow-hidden">
-                            <h4 class="font-bold text-sm text-slate-800 line-clamp-1">${p.name}</h4>
-                            <div class="flex items-center space-x-2 mt-0.5">
-                                <span class="px-2 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-bold rounded">${p.category}</span>
-                                <span class="px-2 py-0.5 ${p.status === 'TERSEDIA' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'} text-[10px] font-bold rounded">${p.status}</span>
-                            </div>
-                            <span class="text-xs font-bold text-blue-700">Rp ${Number(p.price).toLocaleString('id-ID')}</span>
-                        </div>
-                    </div>
-                    <div class="flex items-center space-x-2 flex-shrink-0">
-                        <button onclick="toggleProductStatus(${p.id})" class="px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 text-xs font-bold rounded-xl transition" title="Ubah Status">
-                            <i class="fa-solid fa-rotate"></i>
-                        </button>
-                        <button onclick="deleteProduct(${p.id})" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-bold rounded-xl transition" title="Hapus">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // --- ADMIN TRANSACTIONS & NOTA ---
-        function renderAdminTransactions() {
-            const list = document.getElementById('admin-transaction-list');
-            if (transactions.length === 0) {
-                list.innerHTML = `<div class="text-center py-8 text-slate-400 text-xs">Belum ada histori atau nota penjualan tercatat. (Hanya terlihat oleh Admin)</div>`;
-                return;
-            }
-
-            list.innerHTML = transactions.map(t => `
-                <div class="bg-slate-50 border border-slate-200 p-5 rounded-2xl space-y-3">
-                    <div class="flex items-center justify-between border-b border-slate-200 pb-3">
-                        <div>
-                            <span class="text-xs font-extrabold text-blue-700">${t.id}</span>
-                            <p class="text-[11px] text-slate-400">${t.date}</p>
-                        </div>
-                        <span class="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-xl">LUNAS / TERJUAL</span>
-                    </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                        <div>
-                            <span class="font-bold text-slate-400 uppercase block mb-1">Detail Barang</span>
-                            <p class="font-bold text-slate-800">${t.productName}</p>
-                            <p class="text-slate-500">Kategori: ${t.category}</p>
-                            <p class="font-extrabold text-blue-700 mt-1">Rp ${Number(t.price).toLocaleString('id-ID')}</p>
-                        </div>
-                        <div>
-                            <span class="font-bold text-slate-400 uppercase block mb-1">Informasi Pembeli</span>
-                            <p class="font-bold text-slate-800">${t.buyerName} (${t.buyerPhone})</p>
-                            <p class="text-slate-500 italic mt-1">Catatan: ${t.buyerNote || '-'}</p>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function clearTransactions() {
-            if (confirm('Yakin ingin menghapus seluruh histori nota penjualan?')) {
-                transactions = [];
-                localStorage.removeItem('dodolan_transactions');
-                renderAdminTransactions();
-                showToast('Histori transaksi dibersihkan.');
-            }
-        }
-
-        // --- ADMIN SETTINGS ---
-        function switchAdminTab(tabName) {
-            document.getElementById('admin-tab-products').classList.add('hidden');
-            document.getElementById('admin-tab-transactions').classList.add('hidden');
-            document.getElementById('admin-tab-settings').classList.add('hidden');
-
-            document.querySelectorAll('.admin-tab-btn').forEach(btn => {
-                btn.className = "admin-tab-btn px-4 py-2 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-blue-50 transition";
-            });
-
-            if (tabName === 'products') {
-                document.getElementById('admin-tab-products').classList.remove('hidden');
-                event.currentTarget.className = "admin-tab-btn px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 text-white shadow transition";
-            } else if (tabName === 'transactions') {
-                document.getElementById('admin-tab-transactions').classList.remove('hidden');
-                event.currentTarget.className = "admin-tab-btn px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 text-white shadow transition";
-            } else if (tabName === 'settings') {
-                document.getElementById('admin-tab-settings').classList.remove('hidden');
-                event.currentTarget.className = "admin-tab-btn px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 text-white shadow transition";
-            }
-        }
-
-        function loadSettingsToForm() {
-            document.getElementById('set-admin-name').value = settings.adminName;
-            document.getElementById('set-web-title').value = settings.webTitle;
-            document.getElementById('set-template').value = settings.template;
-            document.getElementById('set-animation').value = settings.animation;
-        }
-
-        function handleSaveSettings(event) {
-            event.preventDefault();
-            settings.adminName = document.getElementById('set-admin-name').value;
-            settings.webTitle = document.getElementById('set-web-title').value;
-            settings.template = document.getElementById('set-template').value;
-            settings.animation = document.getElementById('set-animation').value;
-
-            const adminPhotoFile = document.getElementById('set-admin-photo').files[0];
-            const webLogoFile = document.getElementById('set-web-logo').files[0];
-
-            let pendingReads = 0;
-            if (adminPhotoFile) pendingReads++;
-            if (webLogoFile) pendingReads++;
-
-            if (pendingReads === 0) {
-                saveSettingsToStorage();
-            } else {
-                if (adminPhotoFile) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        settings.adminPhoto = e.target.result;
-                        pendingReads--;
-                        if (pendingReads === 0) saveSettingsToStorage();
-                    };
-                    reader.readAsDataURL(adminPhotoFile);
-                }
-                if (webLogoFile) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        settings.webLogo = e.target.result;
-                        pendingReads--;
-                        if (pendingReads === 0) saveSettingsToStorage();
-                    };
-                    reader.readAsDataURL(webLogoFile);
-                }
-            }
-        }
-
-        function saveSettingsToStorage() {
-            localStorage.setItem('dodolan_settings', JSON.stringify(settings));
-            applySettingsToUI();
-            showToast('Pengaturan web berhasil diperbarui!');
-        }
     </script>
 </body>
 </html>
