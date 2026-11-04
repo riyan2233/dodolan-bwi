@@ -2,7 +2,7 @@
 <html lang="id" class="h-full">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title id="page-title">DODOLAN - Marketplace by Riyan</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -69,6 +69,142 @@
         #checkout-modal > div {max-height:calc(100dvh - 2rem);overflow-y:auto}
         #product-grid > * {min-width:0}
         @media(max-width:640px) {#main-header > div {height:4.3rem;padding-inline:12px} #logo-container {width:42px;height:42px} #brand-title {font-size:1.22rem} main {padding-top:1rem!important;padding-inline:12px!important} #view-catalog > div:first-child {padding:1.35rem} #view-catalog h1 {font-size:1.55rem} #product-grid {grid-template-columns:repeat(2,minmax(0,1fr));gap:10px} #product-grid article > div:first-child {height:132px} #product-grid article > div:last-child {padding:11px;gap:9px} #product-grid article h3 {font-size:13px} #product-grid article span.text-base {font-size:12px} #product-grid article button {padding:7px 10px} #view-admin .rounded-3xl {border-radius:17px} #view-admin .p-6 {padding:16px} #view-login {padding-top:22px} #view-login > div {padding:21px} .category-btn {padding:8px 10px} }
+body[data-theme="modern-blue"] { --accent-600: #2563eb; --accent-soft: #38bdf8; --accent-700: #1d4ed8; --bg-a: #164e9b; --bg-b: #3730a3; --bg-c: #1d4ed8; }
+body[data-theme="ocean-deep"] { --accent-600: #0e7490; --accent-soft: #06b6d4; --accent-700: #0e7490; --bg-a: #083344; --bg-b: #164e63; --bg-c: #0e7490; }
+body[data-theme="sky-light"] { --accent-600: #0284c7; --accent-soft: #7dd3fc; --accent-700: #0284c7; --bg-a: #075985; --bg-b: #2563eb; --bg-c: #0284c7; }
+body[data-theme="emerald-fresh"] { --accent-600: #059669; --accent-soft: #34d399; --accent-700: #047857; --bg-a: #064e3b; --bg-b: #065f46; --bg-c: #047857; }
+body[data-theme="forest-green"] { --accent-600: #15803d; --accent-soft: #86efac; --accent-700: #166534; --bg-a: #14532d; --bg-b: #166534; --bg-c: #166534; }
+body[data-theme="sunset-orange"] { --accent-600: #ea580c; --accent-soft: #fdba74; --accent-700: #c2410c; --bg-a: #7c2d12; --bg-b: #9a3412; --bg-c: #c2410c; }
+body[data-theme="rose-elegant"] { --accent-600: #db2777; --accent-soft: #f9a8d4; --accent-700: #be185d; --bg-a: #831843; --bg-b: #9d174d; --bg-c: #be185d; }
+body[data-theme="ruby-red"] { --accent-600: #dc2626; --accent-soft: #fb7185; --accent-700: #b91c1c; --bg-a: #7f1d1d; --bg-b: #991b1b; --bg-c: #b91c1c; }
+body[data-theme="purple-luxe"] { --accent-600: #7c3aed; --accent-soft: #c084fc; --accent-700: #6d28d9; --bg-a: #3b0764; --bg-b: #581c87; --bg-c: #6d28d9; }
+body[data-theme="midnight-gold"] { --accent-600: #b45309; --accent-soft: #fbbf24; --accent-700: #92400e; --bg-a: #111827; --bg-b: #1f2937; --bg-c: #92400e; }
+body[data-theme="teal-modern"] { --accent-600: #0d9488; --accent-soft: #5eead4; --accent-700: #0f766e; --bg-a: #134e4a; --bg-b: #115e59; --bg-c: #0f766e; }
+body[data-theme="graphite-silver"] { --accent-600: #475569; --accent-soft: #94a3b8; --accent-700: #334155; --bg-a: #0f172a; --bg-b: #334155; --bg-c: #334155; }
+body[data-theme="coffee-cream"] { --accent-600: #92400e; --accent-soft: #d6a86d; --accent-700: #78350f; --bg-a: #3f2d20; --bg-b: #684a32; --bg-c: #78350f; }
+
+        /* DODOLAN RESPONSIVE V2 — desain presisi HP, tablet, laptop */
+        :root { color-scheme: light; }
+        *, *::before, *::after { box-sizing: border-box; }
+        html { width:100%; max-width:100%; scroll-padding-top:5rem; -webkit-text-size-adjust:100%; }
+        body { min-height:100dvh; width:100%; margin:0; }
+        img, svg, video { max-width:100%; }
+        button, input, select, textarea { font:inherit; }
+        button { touch-action: manipulation; }
+        #view-catalog, #view-detail, #view-login, #view-admin { width:100%; min-width:0; }
+        main > section, main > section > * { min-width:0; }
+        #toast-container { max-width:calc(100vw - 1.5rem); right: .75rem; top: max(.75rem, env(safe-area-inset-top)); }
+        #toast-container > * { overflow-wrap:anywhere; }
+        #main-header .brand-wrap > div:last-child { min-width:0; }
+        #brand-title { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width: 16rem; }
+        #admin-guest-nav { min-width:0; }
+        #hero-banner { isolation:isolate; }
+        #view-catalog > div:nth-child(2) { min-width:0; }
+        #category-tabs { min-width:0; scrollbar-width:thin; scroll-snap-type:x proximity; overscroll-behavior-x:contain; -webkit-overflow-scrolling:touch; }
+        #category-tabs .category-btn { scroll-snap-align:start; min-height:39px; }
+        #product-grid > article { min-width:0; }
+        #product-grid article h3, #product-grid article p, #product-grid article .break-words { overflow-wrap:anywhere; }
+        #checkout-modal { overscroll-behavior:contain; }
+        #checkout-modal > div { width:min(100%, 30rem); }
+        #admin-tab-settings, #admin-tab-products, #admin-tab-transactions { min-width:0; }
+        #view-admin input, #view-admin textarea, #view-admin select { min-width:0; max-width:100%; }
+        #view-admin .grid > * { min-width:0; }
+        #view-admin .admin-tab-btn { min-height:40px; }
+        .theme-preview-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:9px; }
+        .theme-choice { min-width:0; border:2px solid #e2e8f0; border-radius:14px; padding:9px 7px; background:#fff; text-align:left; cursor:pointer; transition:border-color .2s, box-shadow .2s, transform .2s; }
+        .theme-choice:focus-visible { outline:3px solid #475569; outline-offset:2px; }
+        .theme-choice[aria-pressed="true"] { border-color:var(--accent-600,#2563eb); box-shadow:0 0 0 2px color-mix(in srgb, var(--accent-600,#2563eb) 18%, transparent); }
+        .theme-choice:active { transform:scale(.98); }
+        .theme-choice .theme-swatch { display:flex; height:25px; overflow:hidden; border-radius:8px; margin-bottom:7px; }
+        .theme-choice .theme-swatch > i { display:block; flex:1; }
+        .theme-choice .theme-label { display:block; font-weight:700; font-size:11px; line-height:1.28; color:#334155; white-space:normal; }
+        body[data-theme] { background-image:linear-gradient(135deg,var(--bg-a),var(--bg-b) 55%,var(--bg-c)) !important; }
+        body[data-theme] #hero-banner { background-image:linear-gradient(112deg,var(--accent-600),var(--accent-700),var(--bg-b)) !important; }
+        body[data-theme] #logo-container { background-image:linear-gradient(135deg,var(--accent-600),var(--accent-soft)) !important; }
+        body[data-theme] .bg-gradient-to-r.from-blue-600 { background-image:linear-gradient(100deg,var(--accent-600),var(--accent-soft)) !important; }
+        body[data-theme] .bg-gradient-to-r.from-blue-700 { background-image:linear-gradient(100deg,var(--accent-700),var(--accent-soft)) !important; }
+        body[data-theme] .bg-blue-600 { background-color:var(--accent-600) !important; }
+        body[data-theme] .bg-blue-700 { background-color:var(--accent-700) !important; }
+        body[data-theme] .bg-blue-50 { background-color:color-mix(in srgb, var(--accent-600) 7%, white) !important; }
+        body[data-theme] .bg-blue-100 { background-color:color-mix(in srgb, var(--accent-600) 13%, white) !important; }
+        body[data-theme] .text-blue-600, body[data-theme] .text-blue-700, body[data-theme] .text-blue-800 { color:var(--accent-700) !important; }
+        body[data-theme] .border-blue-100 { border-color:color-mix(in srgb, var(--accent-600) 17%, white) !important; }
+        body[data-theme] .hover\:bg-blue-50:hover { background-color:color-mix(in srgb, var(--accent-600) 8%, white) !important; }
+        body[data-theme] .hover\:bg-blue-700:hover { background-color:var(--accent-700) !important; }
+        body[data-theme] .focus\:ring-blue-500:focus { --tw-ring-color:var(--accent-600) !important; }
+        body[data-theme] .category-btn.bg-blue-600 { background-color:var(--accent-600) !important; color:white !important; }
+        body[data-theme] #hero-banner p { color:rgba(255,255,255,.9) !important; }
+        body[data-theme] #hero-banner .bg-white\/20 { background-color:rgba(255,255,255,.18) !important; }
+        @keyframes bannerFloat { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-6px); } }
+        body[data-animation="bounce"] #hero-banner { animation:bannerFloat 3.2s ease-in-out infinite; }
+        body[data-animation="none"] #hero-banner { animation:none !important; }
+        @media (prefers-reduced-motion:reduce) { #hero-banner, .animate-fade-in { animation:none !important; } html { scroll-behavior:auto; } }
+        /* Layout mobile ketat untuk menghindari pergeseran horizontal */
+        @media(max-width:767px) {
+          #main-header > div { height:4.3rem !important; padding-inline:12px; gap:6px; }
+          #main-header .brand-wrap { gap:8px; flex:1; }
+          #main-header .brand-wrap .space-x-3 > :not([hidden]) ~ :not([hidden]) { margin-left:0; }
+          #main-header .nav-actions { gap:4px; }
+          #main-header .nav-actions > :not([hidden]) ~ :not([hidden]) { margin-left:0; }
+          #main-header .nav-actions button { padding:8px 9px; font-size:12px; min-height:39px; white-space:nowrap; }
+          #logo-container { width:40px !important; height:40px !important; flex-shrink:0; }
+          #brand-title { font-size:clamp(1.03rem,4.65vw,1.45rem) !important; max-width:calc(100vw - 186px); }
+          #main-header .brand-wrap p { font-size:10px; white-space:nowrap; }
+          main { padding:14px 12px 20px !important; }
+          #view-catalog { row-gap:17px; }
+          #hero-banner { padding:24px 20px !important; border-radius:19px; }
+          #hero-banner h1 { font-size:clamp(1.45rem,5.6vw,2.3rem) !important; line-height:1.19; }
+          #hero-banner p { font-size:12px !important; line-height:1.6; }
+          #hero-banner .relative.z-10 { row-gap:12px; }
+          #view-catalog > div:nth-child(2) { padding:12px !important; gap:10px; }
+          #category-tabs { width:100%; padding-bottom:6px; gap:7px; }
+          #category-tabs .category-btn { padding:8px 11px !important; font-size:12px; }
+          #search-input { font-size:16px; }
+          #product-grid { grid-template-columns:repeat(2,minmax(0,1fr)) !important; gap:10px !important; }
+          #product-grid article { border-radius:17px; }
+          #product-grid article > div:first-child { height:clamp(118px,37vw,175px) !important; }
+          #product-grid article > div:last-child { padding:11px !important; gap:9px; }
+          #product-grid article h3 { font-size:13px; line-height:1.4; }
+          #product-grid article span.text-base { font-size:12px; }
+          #product-grid article button { padding:8px 10px !important; font-size:11px; }
+          #product-grid article .pt-3 { padding-top:9px; gap:6px; }
+          #view-detail .rounded-3xl, #view-login .rounded-3xl, #view-admin .rounded-3xl { border-radius:18px; }
+          #product-detail-container { padding:14px !important; }
+          #product-detail-container .h-72 { height:220px; }
+          #view-login { padding-top:clamp(10px,5vw,28px) !important; }
+          #view-login > div { padding:21px !important; }
+          #view-login input { font-size:16px; }
+          #view-admin { row-gap:16px; }
+          #view-admin .p-6 { padding:15px !important; }
+          #view-admin .sm\:p-8 { padding:15px !important; }
+          #view-admin .flex.items-center.space-x-4 { gap:10px; }
+          #view-admin .flex.items-center.space-x-4 > :not([hidden]) ~ :not([hidden]) { margin-left:0; }
+          #view-admin .w-20.h-20 { width:56px; height:56px; flex-shrink:0; }
+          #view-admin #admin-welcome-name { font-size:20px; }
+          #view-admin input[type=file] { font-size:12px; }
+          #checkout-modal { padding-inline:12px; }
+          #checkout-modal > div { border-radius:18px; padding:17px !important; }
+          footer { margin-top:25px !important; }
+        }
+        @media(max-width:380px) {
+          #main-header .brand-wrap p { display:none; }
+          #brand-title { max-width:calc(100vw - 172px); }
+          #product-grid article > div:last-child { padding:9px !important; }
+          #product-grid article .pt-3 { flex-direction:column; align-items:stretch; }
+          #product-grid article button { width:100%; }
+          .theme-preview-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+        }
+        @media(min-width:768px) and (max-width:1100px) {
+          #view-catalog > div:nth-child(2) { align-items:stretch; }
+          #category-tabs { max-width:100%; }
+          #product-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
+        }
+        @media(min-width:768px) {
+          .theme-preview-grid { grid-template-columns:repeat(4,minmax(0,1fr)); }
+          #category-tabs { flex:1 1 0; width:auto; }
+          #view-catalog > div:nth-child(2) > .relative { flex:0 0 min(18rem,40%); min-width:0; }
+        }
+
     </style>
 </head>
 <body class="h-full bg-gradient-to-br from-sky-900 via-blue-800 to-indigo-900 text-slate-800 font-sans antialiased flex flex-col justify-between selection:bg-blue-500 selection:text-white">
@@ -78,9 +214,9 @@
 
     <!-- Header / Navbar -->
     <header id="main-header" class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-blue-100 shadow-sm transition-all duration-300">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-2">
             <!-- Brand Logo -->
-            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchView('catalog')">
+            <div class="brand-wrap flex items-center space-x-3 cursor-pointer min-w-0" onclick="switchView('catalog')">
                 <div id="logo-container" class="w-12 h-12 rounded-xl bg-gradient-to-tr from-blue-600 to-sky-400 flex items-center justify-center text-white shadow-lg shadow-blue-500/30 overflow-hidden">
                     <i class="fa-solid fa-store text-xl" id="logo-icon"></i>
                 </div>
@@ -91,7 +227,7 @@
             </div>
 
             <!-- Navigation & Actions -->
-            <div class="flex items-center space-x-3 sm:space-x-4">
+            <div class="nav-actions flex items-center space-x-2 sm:space-x-4 shrink-0">
                 <button onclick="switchView('catalog')" class="px-4 py-2 rounded-xl text-sm font-semibold text-slate-700 hover:bg-blue-50 transition flex items-center space-x-2">
                     <i class="fa-solid fa-compass text-blue-600"></i>
                     <span class="hidden sm:inline">Katalog</span>
@@ -110,22 +246,23 @@
         <!-- VIEW 1: CATALOGUE / HOME -->
         <section id="view-catalog" class="space-y-8 animate-fade-in">
             <!-- Hero Banner -->
-            <div class="relative rounded-3xl bg-gradient-to-r from-blue-600 via-sky-600 to-indigo-700 text-white p-8 sm:p-12 shadow-2xl overflow-hidden animate-pulse-glow">
+            <div id="hero-banner" class="relative rounded-3xl bg-gradient-to-r from-blue-600 via-sky-600 to-indigo-700 text-white p-8 sm:p-12 shadow-2xl overflow-hidden animate-pulse-glow">
                 <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
                 <div class="relative z-10 max-w-2xl space-y-4">
                     <span class="px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-bold uppercase tracking-wider">Platform Jual Beli Terpercaya</span>
-                    <h1 class="text-3xl sm:text-5xl font-black tracking-tight leading-tight">Temukan Hunian, Kendaraan & Barang Impian Anda</h1>
-                    <p class="text-blue-100 text-sm sm:text-base font-normal">Semua kebutuhan properti, otomotif, tanah, hingga elektronik berkualitas tersedia di DODOLAN by Riyan.</p>
+                    <h1 class="text-3xl sm:text-5xl font-black tracking-tight leading-tight">Temukan Rumah, Sawah, Kendaraan & Barang Impian Anda</h1>
+                    <p class="text-blue-100 text-sm sm:text-base font-normal">Jelajahi rumah, sawah, tanah, kendaraan, hingga elektronik pilihan di DODOLAN by Riyan.</p>
                 </div>
             </div>
 
             <!-- Filter & Search Toolbar -->
             <div class="bg-white/90 backdrop-blur-md p-4 sm:p-6 rounded-2xl shadow-sm border border-blue-100 flex flex-col md:flex-row gap-4 items-center justify-between">
                 <!-- Kategori Tabs -->
-                <div class="flex items-center space-x-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 scrollbar-none">
+                <div id="category-tabs" class="flex items-center space-x-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 scrollbar-none" aria-label="Filter kategori produk">
                     <button onclick="filterCategory('ALL')" class="category-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-blue-600 text-white shadow-md shadow-blue-500/20 transition whitespace-nowrap">Semua</button>
                     <button onclick="filterCategory('Rumah')" class="category-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 text-slate-700 hover:bg-blue-50 transition whitespace-nowrap"><i class="fa-solid fa-house mr-1.5"></i> Rumah</button>
                     <button onclick="filterCategory('Tanah')" class="category-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 text-slate-700 hover:bg-blue-50 transition whitespace-nowrap"><i class="fa-solid fa-mountain mr-1.5"></i> Tanah</button>
+                    <button onclick="filterCategory('Sawah')" class="category-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 text-slate-700 hover:bg-blue-50 transition whitespace-nowrap"><i class="fa-solid fa-seedling mr-1.5"></i> Sawah</button>
                     <button onclick="filterCategory('Mobil')" class="category-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 text-slate-700 hover:bg-blue-50 transition whitespace-nowrap"><i class="fa-solid fa-car mr-1.5"></i> Mobil</button>
                     <button onclick="filterCategory('Sepeda Motor')" class="category-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 text-slate-700 hover:bg-blue-50 transition whitespace-nowrap"><i class="fa-solid fa-motorcycle mr-1.5"></i> Motor</button>
                     <button onclick="filterCategory('Elektronik')" class="category-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 text-slate-700 hover:bg-blue-50 transition whitespace-nowrap"><i class="fa-solid fa-laptop mr-1.5"></i> Elektronik</button>
@@ -219,9 +356,10 @@
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 mb-1">Kategori</label>
-                                <select id="prod-cat" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500">
+                                <select id="prod-cat" onchange="updateProductDescriptionHint()" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500">
                                     <option value="Rumah">Rumah</option>
                                     <option value="Tanah">Tanah</option>
+                                    <option value="Sawah">Sawah</option>
                                     <option value="Mobil">Mobil</option>
                                     <option value="Sepeda Motor">Sepeda Motor</option>
                                     <option value="Elektronik">Elektronik</option>
@@ -296,22 +434,40 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Pilihan Template Tampilan</label>
-                                <select id="set-template" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500">
-                                    <option value="modern-blue">Modern Biru Gradasi (Default)</option>
-                                    <option value="ocean-deep">Ocean Deep Dark</option>
-                                    <option value="sky-light">Clean Sky Bright</option>
+                                <select id="set-template" onchange="previewThemeSelection(this.value)" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500">
+                                    <option value="modern-blue">Biru Modern</option>
+                                    <option value="ocean-deep">Biru Laut Dalam</option>
+                                    <option value="sky-light">Biru Langit Cerah</option>
+                                    <option value="emerald-fresh">Hijau Zamrud</option>
+                                    <option value="forest-green">Hijau Hutan</option>
+                                    <option value="sunset-orange">Oranye Senja</option>
+                                    <option value="rose-elegant">Pink Elegan</option>
+                                    <option value="ruby-red">Merah Ruby</option>
+                                    <option value="purple-luxe">Ungu Mewah</option>
+                                    <option value="midnight-gold">Hitam Emas</option>
+                                    <option value="teal-modern">Toska Modern</option>
+                                    <option value="graphite-silver">Abu Minimalis</option>
+                                    <option value="coffee-cream">Cokelat Kopi</option>
                                 </select>
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Efek Animasi Banner</label>
-                                <select id="set-animation" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500">
+                                <select id="set-animation" onchange="previewAnimationSelection(this.value)" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500">
                                     <option value="pulse">Pulse Glow</option>
                                     <option value="bounce">Bounce Smooth</option>
                                     <option value="none">Tanpa Animasi</option>
                                 </select>
                             </div>
                         </div>
-                        <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg transition">Simpan Pengaturan</button>
+                        <div class="space-y-3 pt-2">
+                            <div class="flex flex-wrap items-center justify-between gap-2">
+                                <label class="text-xs font-bold text-slate-700 uppercase tracking-wider">Galeri 13 Tema Warna</label>
+                                <span class="text-[11px] text-slate-500">Ketuk tema untuk melihat pratinjau</span>
+                            </div>
+                            <div id="theme-preview-grid" class="theme-preview-grid" role="group" aria-label="Pilihan tema warna website"></div>
+                            <p id="theme-preview-status" class="text-xs text-slate-600" aria-live="polite">Pilih tema, lalu klik Simpan Pengaturan.</p>
+                        </div>
+                        <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg transition">Simpan Pengaturan & Tema</button>
                     </form>
                     <div class="border-t border-blue-100 pt-4 space-y-2"><h4 class="text-sm font-bold">Pindahkan produk versi lama</h4><p class="text-xs text-slate-500">Jika sebelumnya menambah produk pada browser yang sama, impor secara manual ke Firestore. Data online tidak dihapus.</p><button onclick="importLegacyData()" class="px-4 py-2 text-sm bg-blue-100 text-blue-800 rounded-xl font-semibold">Impor data lama dari browser ini</button></div>
                 </div>
@@ -364,7 +520,7 @@ import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from
 import { getFirestore, collection, doc, getDoc, onSnapshot, addDoc, setDoc, updateDoc, deleteDoc, writeBatch, serverTimestamp } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js';
 
 const firebaseConfig = {
-  apiKey: 'AIzaSyBsAdrihgLonDorEHglVR_yqS-LUw5efn8',
+  apiKey: 'AIzaSyBsAdrihgLonDorEHg1VR_yqS-LUw5efn8',
   authDomain: 'dodolan-bwi.firebaseapp.com',
   projectId: 'dodolan-bwi',
   storageBucket: 'dodolan-bwi.firebasestorage.app',
@@ -376,7 +532,49 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const DEFAULT_SETTINGS = { webTitle:'DODOLAN', adminName:'Admin Riyan', adminPhoto:'https://placehold.co/100x100/0284c7/ffffff?text=Riyan', webLogo:'', template:'modern-blue', animation:'pulse' };
-const CATEGORIES = ['Rumah','Tanah','Mobil','Sepeda Motor','Elektronik'];
+const CATEGORIES = ['Rumah','Tanah','Sawah','Mobil','Sepeda Motor','Elektronik'];
+const THEME_PALETTES = [
+  {id:'modern-blue', name:'Biru Modern', colors:['#2563eb','#38bdf8','#164e9b']},
+  {id:'ocean-deep', name:'Biru Laut Dalam', colors:['#0e7490','#06b6d4','#083344']},
+  {id:'sky-light', name:'Biru Langit Cerah', colors:['#0284c7','#7dd3fc','#075985']},
+  {id:'emerald-fresh', name:'Hijau Zamrud', colors:['#059669','#34d399','#064e3b']},
+  {id:'forest-green', name:'Hijau Hutan', colors:['#15803d','#86efac','#14532d']},
+  {id:'sunset-orange', name:'Oranye Senja', colors:['#ea580c','#fdba74','#7c2d12']},
+  {id:'rose-elegant', name:'Pink Elegan', colors:['#db2777','#f9a8d4','#831843']},
+  {id:'ruby-red', name:'Merah Ruby', colors:['#dc2626','#fb7185','#7f1d1d']},
+  {id:'purple-luxe', name:'Ungu Mewah', colors:['#7c3aed','#c084fc','#3b0764']},
+  {id:'midnight-gold', name:'Hitam Emas', colors:['#b45309','#fbbf24','#111827']},
+  {id:'teal-modern', name:'Toska Modern', colors:['#0d9488','#5eead4','#134e4a']},
+  {id:'graphite-silver', name:'Abu Minimalis', colors:['#475569','#94a3b8','#0f172a']},
+  {id:'coffee-cream', name:'Cokelat Kopi', colors:['#92400e','#d6a86d','#3f2d20']},
+];
+const THEME_IDS = new Set(THEME_PALETTES.map(t => t.id));
+function safeThemeName(name){ return THEME_IDS.has(name) ? name : 'modern-blue'; }
+function renderThemePreviews() {
+  const grid=$('theme-preview-grid');
+  if(!grid) return;
+  const selected=safeThemeName($('set-template').value);
+  grid.innerHTML=THEME_PALETTES.map(t=>`<button type="button" class="theme-choice" aria-pressed="${t.id===selected}" onclick="chooseTheme('${t.id}')" title="Tema ${t.name}"><span class="theme-swatch" aria-hidden="true">${t.colors.map(c=>`<i style="background:${c}"></i>`).join('')}</span><span class="theme-label">${t.name}</span></button>`).join('');
+}
+function previewThemeSelection(name){
+  const selected=safeThemeName(name);
+  document.body.dataset.theme=selected;
+  renderThemePreviews();
+  const status=$('theme-preview-status');
+  if(status)status.textContent='Pratinjau '+(THEME_PALETTES.find(t=>t.id===selected)?.name||'tema')+' — klik Simpan Pengaturan & Tema agar semua perangkat ikut berubah.';
+}
+function chooseTheme(id){
+  if(!THEME_IDS.has(id))return;
+  $('set-template').value=id;
+  previewThemeSelection(id);
+}
+function previewAnimationSelection(name){ document.body.dataset.animation=['pulse','bounce','none'].includes(name)?name:'pulse'; }
+function updateProductDescriptionHint(){
+  const desc=$('prod-desc'),cat=$('prod-cat')?.value;
+  if(!desc)return;
+  desc.placeholder=cat==='Sawah'?'Luas sawah (m²/ha), lokasi, akses jalan, jenis irigasi, surat tanah, kondisi lahan...':'Spesifikasi lengkap, lokasi, kondisi...';
+}
+
 let settings = {...DEFAULT_SETTINGS}, products=[], transactions=[], currentAdmin=null,
     currentFilter='ALL', currentSearchQuery='', temporaryUploadedImages=[], pendingFileConversion=false,
     unsubscribeOrders=null, currentView='catalog', productsLoaded=false;
@@ -414,6 +612,8 @@ function applySettingsToUI(){
   $('logo-container').innerHTML=settings.webLogo ? `<img src="${imageUrl(settings.webLogo)}" alt="Logo" class="w-full h-full object-cover">` : '<i class="fa-solid fa-store text-xl"></i>';
   $('admin-profile-preview-header').src=settings.adminPhoto||DEFAULT_SETTINGS.adminPhoto;
   $('admin-welcome-name').textContent=`Halo, ${settings.adminName}`;
+  document.body.dataset.theme=safeThemeName(settings.template);
+  document.body.dataset.animation=['pulse','bounce','none'].includes(settings.animation)?settings.animation:'pulse';
 }
 function filterCategory(cat){
   currentFilter=cat;
@@ -573,12 +773,16 @@ function switchAdminTab(tabName,button=null){
 function loadSettingsToForm(){
   $('set-admin-name').value=settings.adminName;
   $('set-web-title').value=settings.webTitle;
-  $('set-template').value=settings.template;
-  $('set-animation').value=settings.animation;
+  $('set-template').value=safeThemeName(settings.template);
+  $('set-animation').value=['pulse','bounce','none'].includes(settings.animation)?settings.animation:'pulse';
+  renderThemePreviews();
+  const status=$('theme-preview-status');
+  if(status)status.textContent='Tema tersimpan: '+(THEME_PALETTES.find(t=>t.id===safeThemeName(settings.template))?.name||'Biru Modern')+'. Pilih tema lain untuk pratinjau.';
+  updateProductDescriptionHint();
 }
 async function handleSaveSettings(event){
   event.preventDefault();if(!currentAdmin)return;
-  const next={...settings,adminName:$('set-admin-name').value.trim().slice(0,70),webTitle:$('set-web-title').value.trim().slice(0,45),template:$('set-template').value,animation:$('set-animation').value};
+  const next={...settings,adminName:$('set-admin-name').value.trim().slice(0,70),webTitle:$('set-web-title').value.trim().slice(0,45),template:safeThemeName($('set-template').value),animation:$('set-animation').value};
   if(!next.adminName||!next.webTitle)return showToast('Isi nama admin dan nama website.','error');
   const btn=event.target.querySelector('button[type="submit"]');btn.disabled=true;
   try{
@@ -664,8 +868,8 @@ onAuthStateChanged(auth,async user=>{
   }
   transactions=[];updateAdminGuestNav();if(currentView==='admin')switchView('catalog');
 });
-applySettingsToUI();updateAdminGuestNav();renderCatalog();
-Object.assign(window,{switchView,filterCategory,handleSearch,viewProductDetail,setPreviewImage,openCheckoutModal,closeCheckoutModal,handleCheckoutSubmit,handleLoginSubmit,handleLogout,handleFileSelect,handleAddProduct,toggleProductStatus,deleteProduct,approveOrder,rejectOrder,renderAdminProducts,renderAdminTransactions,clearTransactions,switchAdminTab,handleSaveSettings,importLegacyData});
+applySettingsToUI();updateAdminGuestNav();renderCatalog();updateProductDescriptionHint();
+Object.assign(window,{switchView,filterCategory,handleSearch,viewProductDetail,setPreviewImage,openCheckoutModal,closeCheckoutModal,handleCheckoutSubmit,handleLoginSubmit,handleLogout,handleFileSelect,handleAddProduct,toggleProductStatus,deleteProduct,approveOrder,rejectOrder,renderAdminProducts,renderAdminTransactions,clearTransactions,switchAdminTab,handleSaveSettings,importLegacyData,chooseTheme,previewThemeSelection,previewAnimationSelection,updateProductDescriptionHint});
 
     </script>
 </body>
