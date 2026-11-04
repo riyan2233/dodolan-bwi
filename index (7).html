@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">DODOLAN - Marketplace by Riyan</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eef8ff',
+                            100: '#d9f0ff',
+                            500: '#0284c7',
+                            600: '#026aa7',
+                            700: '#035388',
+                            900: '#0b3251'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 15px rgba(2, 132, 199, 0.4); }
+            50% { box-shadow: 0 0 30px rgba(2, 132, 199, 0.8); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+        .animate-pulse-glow {
+            animation: pulseGlow 3s infinite;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        html,body {max-width:100%;overflow-x:hidden}
+        #checkout-modal {overflow-y:auto;align-items:flex-start;padding-top:max(1rem,env(safe-area-inset-top));padding-bottom:max(1rem,env(safe-area-inset-bottom))}
+        #checkout-modal > div {max-height:calc(100dvh - 2rem);overflow-y:auto}
+        #product-grid > * {min-width:0}
+        @media(max-width:640px) {#main-header > div {height:4.3rem;padding-inline:12px} #logo-container {width:42px;height:42px} #brand-title {font-size:1.22rem} main {padding-top:1rem!important;padding-inline:12px!important} #view-catalog > div:first-child {padding:1.35rem} #view-catalog h1 {font-size:1.55rem} #product-grid {grid-template-columns:repeat(2,minmax(0,1fr));gap:10px} #product-grid article > div:first-child {height:132px} #product-grid article > div:last-child {padding:11px;gap:9px} #product-grid article h3 {font-size:13px} #product-grid article span.text-base {font-size:12px} #product-grid article button {padding:7px 10px} #view-admin .rounded-3xl {border-radius:17px} #view-admin .p-6 {padding:16px} #view-login {padding-top:22px} #view-login > div {padding:21px} .category-btn {padding:8px 10px} }
+    </style>
+</head>
+<body class="h-full bg-gradient-to-br from-sky-900 via-blue-800 to-indigo-900 text-slate-800 font-sans antialiased flex flex-col justify-between selection:bg-blue-500 selection:text-white">
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+    <!-- Header / Navbar -->
+    <header id="main-header" class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-blue-100 shadow-sm transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <!-- Brand Logo -->
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchView('catalog')">
+                <div id="logo-container" class="w-12 h-12 rounded-xl bg-gradient-to-tr from-blue-600 to-sky-400 flex items-center justify-center text-white shadow-lg shadow-blue-500/30 overflow-hidden">
+                    <i class="fa-solid fa-store text-xl" id="logo-icon"></i>
+                </div>
+                <div>
+                    <span id="brand-title" class="text-2xl font-extrabold bg-gradient-to-r from-blue-700 to-sky-500 bg-clip-text text-transparent tracking-tight">DODOLAN</span>
+                    <p class="text-xs font-medium text-slate-500">Marketplace by Riyan</p>
+                </div>
+            </div>
+
+            <!-- Navigation & Actions -->
+            <div class="flex items-center space-x-3 sm:space-x-4">
+                <button onclick="switchView('catalog')" class="px-4 py-2 rounded-xl text-sm font-semibold text-slate-700 hover:bg-blue-50 transition flex items-center space-x-2">
+                    <i class="fa-solid fa-compass text-blue-600"></i>
+                    <span class="hidden sm:inline">Katalog</span>
+                </button>
+                
+                <div id="admin-guest-nav" class="flex items-center space-x-2">
+                    <!-- Dinamis terisi oleh JS (Login vs Admin Panel) -->
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- VIEW 1: CATALOGUE / HOME -->
+        <section id="view-catalog" class="space-y-8 animate-fade-in">
+            <!-- Hero Banner -->
+            <div class="relative rounded-3xl bg-gradient-to-r from-blue-600 via-sky-600 to-indigo-700 text-white p-8 sm:p-12 shadow-2xl overflow-hidden animate-pulse-glow">
+                <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+                <div class="relative z-10 max-w-2xl space-y-4">
+                    <span class="px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-bold uppercase tracking-wider">Platform Jual Beli Terpercaya</span>
+                    <h1 class="text-3xl sm:text-5xl font-black tracking-tight leading-tight">Temukan Hunian, Kendaraan & Barang Impian Anda</h1>
+                    <p class="text-blue-100 text-sm sm:text-base font-normal">Semua kebutuhan properti, otomotif, tanah, hingga elektronik berkualitas tersedia di DODOLAN by Riyan.</p>
+                </div>
+            </div>
+
+            <!-- Filter & Search Toolbar -->
+            <div class="bg-white/90 backdrop-blur-md p-4 sm:p-6 rounded-2xl shadow-sm border border-blue-100 flex flex-col md:flex-row gap-4 items-center justify-between">
+                <!-- Kategori Tabs -->
+                <div class="flex items-center space-x-2 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 scrollbar-none">
+                    <button onclick="filterCategory('ALL')" class="category-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-blue-600 text-white shadow-md shadow-blue-500/20 transition whitespace-nowrap">Semua</button>
+                    <button onclick="filterCategory('Rumah')" class="category-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 text-slate-700 hover:bg-blue-50 transition whitespace-nowrap"><i class="fa-solid fa-house mr-1.5"></i> Rumah</button>
+                    <button onclick="filterCategory('Tanah')" class="category-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 text-slate-700 hover:bg-blue-50 transition whitespace-nowrap"><i class="fa-solid fa-mountain mr-1.5"></i> Tanah</button>
+                    <button onclick="filterCategory('Mobil')" class="category-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 text-slate-700 hover:bg-blue-50 transition whitespace-nowrap"><i class="fa-solid fa-car mr-1.5"></i> Mobil</button>
+                    <button onclick="filterCategory('Sepeda Motor')" class="category-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 text-slate-700 hover:bg-blue-50 transition whitespace-nowrap"><i class="fa-solid fa-motorcycle mr-1.5"></i> Motor</button>
+                    <button onclick="filterCategory('Elektronik')" class="category-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold bg-slate-100 text-slate-700 hover:bg-blue-50 transition whitespace-nowrap"><i class="fa-solid fa-laptop mr-1.5"></i> Elektronik</button>
+                </div>
+
+                <!-- Search Input -->
+                <div class="relative w-full md:w-72">
+                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                        <i class="fa-solid fa-search"></i>
+                    </span>
+                    <input type="text" id="search-input" oninput="handleSearch()" placeholder="Cari barang di DODOLAN..." class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
+                </div>
+            </div>
+
+            <!-- Product Grid -->
+            <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Terisi dinamis oleh JS -->
+            </div>
+        </section>
+
+        <!-- VIEW 2: PRODUCT DETAIL -->
+        <section id="view-detail" class="hidden space-y-6 animate-fade-in">
+            <button onclick="switchView('catalog')" class="inline-flex items-center space-x-2 text-white bg-blue-700/60 hover:bg-blue-700 px-4 py-2 rounded-xl text-sm font-semibold backdrop-blur-md transition">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Kembali ke Katalog</span>
+            </button>
+            <div id="product-detail-container" class="bg-white rounded-3xl shadow-xl overflow-hidden border border-blue-100 p-6 sm:p-8">
+                <!-- Terisi dinamis oleh JS -->
+            </div>
+        </section>
+
+        <!-- VIEW 3: ADMIN LOGIN -->
+        <section id="view-login" class="hidden max-w-md mx-auto animate-fade-in pt-12">
+            <div class="bg-white/95 backdrop-blur-md p-8 rounded-3xl shadow-2xl border border-blue-100 space-y-6">
+                <div class="text-center space-y-2">
+                    <div class="w-16 h-16 bg-gradient-to-tr from-blue-600 to-sky-400 rounded-2xl mx-auto flex items-center justify-center text-white text-2xl shadow-lg shadow-blue-500/30">
+                        <i class="fa-solid fa-user-shield"></i>
+                    </div>
+                    <h2 class="text-2xl font-black text-slate-800">Login Admin</h2>
+                    <p class="text-xs text-slate-500">Masuk menggunakan akun Firebase untuk mengelola produk dan pesanan.</p>
+                </div>
+                <form onsubmit="handleLoginSubmit(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Email Admin Firebase</label>
+                        <input type="email" id="login-user" autocomplete="username" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="email@contoh.com">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Password</label>
+                        <input type="password" id="login-pass" autocomplete="current-password" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="w-full py-3 bg-gradient-to-r from-blue-600 to-sky-500 hover:from-blue-700 hover:to-sky-600 text-white font-bold rounded-xl shadow-lg shadow-blue-500/30 transition">
+                        Masuk Dashboard
+                    </button>
+                    <div class="text-center">
+                        <p class="text-xs text-slate-400">Gunakan akun Email/Password Firebase yang sudah diberi akses admin.</p>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- VIEW 4: ADMIN DASHBOARD (PENGATURAN & PRODUK & NOTA) -->
+        <section id="view-admin" class="hidden space-y-8 animate-fade-in">
+            <!-- Admin Header Banner -->
+            <div class="bg-white/95 backdrop-blur-md rounded-3xl p-6 sm:p-8 shadow-xl border border-blue-100 flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="flex items-center space-x-4">
+                    <img id="admin-profile-preview-header" src="https://placehold.co/100x100/0284c7/ffffff?text=Admin" alt="Admin" class="w-20 h-20 rounded-2xl object-cover shadow-md border-2 border-blue-500">
+                    <div>
+                        <span class="px-2.5 py-1 bg-blue-100 text-blue-700 rounded-lg text-xs font-bold uppercase tracking-wider">Admin Panel</span>
+                        <h2 id="admin-welcome-name" class="text-2xl font-black text-slate-800 mt-1">Halo, Admin Riyan</h2>
+                        <p class="text-xs text-slate-500">Kelola katalog jualan, status terjual, nota transaksi, dan kustomisasi web.</p>
+                    </div>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="switchAdminTab('products',this)" class="admin-tab-btn px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 text-white shadow transition"><i class="fa-solid fa-box mr-1.5"></i> Kelola Produk</button>
+                    <button onclick="switchAdminTab('transactions',this)" class="admin-tab-btn px-4 py-2 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-blue-50 transition"><i class="fa-solid fa-receipt mr-1.5"></i> Histori & Nota</button>
+                    <button onclick="switchAdminTab('settings',this)" class="admin-tab-btn px-4 py-2 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-blue-50 transition"><i class="fa-solid fa-gear mr-1.5"></i> Pengaturan Web</button>
+                    <button onclick="handleLogout()" class="px-4 py-2 rounded-xl text-xs font-bold bg-rose-50 text-rose-600 hover:bg-rose-100 transition"><i class="fa-solid fa-right-from-bracket mr-1.5"></i> Logout</button>
+                </div>
+            </div>
+
+            <!-- ADMIN TAB 1: PRODUK (Tambah & List) -->
+            <div id="admin-tab-products" class="space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Form Tambah Produk -->
+                    <div class="bg-white/95 backdrop-blur-md p-6 rounded-3xl shadow-xl border border-blue-100 space-y-4 lg:col-span-1">
+                        <h3 class="text-lg font-bold text-slate-800 flex items-center"><i class="fa-solid fa-circle-plus text-blue-600 mr-2"></i> Tambah Produk Baru</h3>
+                        <form onsubmit="handleAddProduct(event)" class="space-y-3">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Nama Produk</label>
+                                <input type="text" id="prod-name" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500" placeholder="Contoh: Rumah Minimalis 2 Lantai">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Kategori</label>
+                                <select id="prod-cat" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500">
+                                    <option value="Rumah">Rumah</option>
+                                    <option value="Tanah">Tanah</option>
+                                    <option value="Mobil">Mobil</option>
+                                    <option value="Sepeda Motor">Sepeda Motor</option>
+                                    <option value="Elektronik">Elektronik</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Harga (Rp)</label>
+                                <input type="number" id="prod-price" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500" placeholder="500000000">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Upload Foto (Maksimal 4 Foto)</label>
+                                <input type="file" id="prod-files" accept="image/png, image/jpeg" multiple required onchange="handleFileSelect(event)" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-500 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                                <p class="text-[11px] text-slate-400 mt-1">Pilih 1 hingga 4 foto format JPG/PNG.</p>
+                                <div id="upload-preview-container" class="grid grid-cols-4 gap-2 mt-2"></div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Deskripsi Lengkap</label>
+                                <textarea id="prod-desc" rows="3" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500" placeholder="Spesifikasi lengkap, lokasi, kondisi..."></textarea>
+                            </div>
+                            <button type="submit" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-sm shadow-md transition">Simpan Produk</button>
+                        </form>
+                    </div>
+
+                    <!-- List Produk Admin -->
+                    <div class="bg-white/95 backdrop-blur-md p-6 rounded-3xl shadow-xl border border-blue-100 space-y-4 lg:col-span-2">
+                        <h3 class="text-lg font-bold text-slate-800 flex items-center"><i class="fa-solid fa-boxes-stacked text-blue-600 mr-2"></i> Daftar Produk Jualan</h3>
+                        <div id="admin-product-list" class="space-y-3 max-h-[600px] overflow-y-auto pr-2">
+                            <!-- Terisi dinamis -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ADMIN TAB 2: TRANSAKSI & NOTA PENJUALAN (Rahasia Admin) -->
+            <div id="admin-tab-transactions" class="hidden space-y-6">
+                <div class="bg-white/95 backdrop-blur-md p-6 rounded-3xl shadow-xl border border-blue-100 space-y-4">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-800 flex items-center"><i class="fa-solid fa-receipt text-blue-600 mr-2"></i> Pesanan & Nota (Khusus Admin)</h3>
+                            <p class="text-xs text-slate-500">Pesanan masuk perlu dikonfirmasi admin. Data pembeli hanya dapat dibaca admin.</p>
+                        </div>
+                        <span class="text-xs text-slate-500">Penyimpanan aman di Firebase</span>
+                    </div>
+                    <div id="admin-transaction-list" class="space-y-4">
+                        <!-- Terisi dinamis -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- ADMIN TAB 3: PENGATURAN WEB & ADMIN -->
+            <div id="admin-tab-settings" class="hidden space-y-6">
+                <div class="bg-white/95 backdrop-blur-md p-6 sm:p-8 rounded-3xl shadow-xl border border-blue-100 space-y-6 max-w-2xl mx-auto">
+                    <h3 class="text-xl font-bold text-slate-800 flex items-center"><i class="fa-solid fa-gear text-blue-600 mr-2"></i> Pengaturan Admin & Tampilan Web</h3>
+                    
+                    <form onsubmit="handleSaveSettings(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Nama Admin</label>
+                            <input type="text" id="set-admin-name" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Foto Profil Admin (Upload File JPG/PNG)</label>
+                            <input type="file" id="set-admin-photo" accept="image/png, image/jpeg" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-500 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Judul Web / Logo Teks</label>
+                            <input type="text" id="set-web-title" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Logo Web (Upload File Icon / Foto JPG/PNG)</label>
+                            <input type="file" id="set-web-logo" accept="image/png, image/jpeg" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-500 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700">
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Pilihan Template Tampilan</label>
+                                <select id="set-template" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500">
+                                    <option value="modern-blue">Modern Biru Gradasi (Default)</option>
+                                    <option value="ocean-deep">Ocean Deep Dark</option>
+                                    <option value="sky-light">Clean Sky Bright</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Efek Animasi Banner</label>
+                                <select id="set-animation" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500">
+                                    <option value="pulse">Pulse Glow</option>
+                                    <option value="bounce">Bounce Smooth</option>
+                                    <option value="none">Tanpa Animasi</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg transition">Simpan Pengaturan</button>
+                    </form>
+                    <div class="border-t border-blue-100 pt-4 space-y-2"><h4 class="text-sm font-bold">Pindahkan produk versi lama</h4><p class="text-xs text-slate-500">Jika sebelumnya menambah produk pada browser yang sama, impor secara manual ke Firestore. Data online tidak dihapus.</p><button onclick="importLegacyData()" class="px-4 py-2 text-sm bg-blue-100 text-blue-800 rounded-xl font-semibold">Impor data lama dari browser ini</button></div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-12 bg-white/80 backdrop-blur-md border-t border-blue-100 py-6">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs font-medium text-slate-500">
+            <p>&copy; 2026 DODOLAN Marketplace. Aplikasi e-commerce by <span class="font-bold text-blue-600">Riyan</span>.</p>
+        </div>
+    </footer>
+
+    <!-- MODAL PEMBELIAN / CHECKOUT -->
+    <div id="checkout-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 animate-fade-in">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg font-bold text-slate-800">Form Pemesanan Produk</h3>
+                <button onclick="closeCheckoutModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div id="checkout-product-info" class="bg-blue-50 p-3 rounded-2xl flex items-center space-x-3">
+                <!-- Info produk ringkas -->
+            </div>
+            <form onsubmit="handleCheckoutSubmit(event)" class="space-y-3">
+                <input type="hidden" id="checkout-prod-id">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Nama Lengkap Pembeli</label>
+                    <input type="text" id="buyer-name" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500" placeholder="Budi Santoso">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Nomor WhatsApp / Telepon</label>
+                    <input type="text" id="buyer-phone" required class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500" placeholder="081234567890">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Catatan / Alamat Pengiriman</label>
+                    <textarea id="buyer-note" rows="2" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500" placeholder="Catatan opsional..."></textarea>
+                </div>
+                <button type="submit" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-md transition">Kirim Pesanan ke Admin</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Firebase Online - DODOLAN -->
+    <script type="module">
+// DODOLAN Firebase Online — single-page frontend, Firebase modular SDK
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js';
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js';
+import { getFirestore, collection, doc, getDoc, onSnapshot, addDoc, setDoc, updateDoc, deleteDoc, writeBatch, serverTimestamp } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: 'AIzaSyBsAdrihgLonDorEHg1VR_yqS-LUw5efn8',
+  authDomain: 'dodolan-bwi.firebaseapp.com',
+  projectId: 'dodolan-bwi',
+  storageBucket: 'dodolan-bwi.firebasestorage.app',
+  messagingSenderId: '1015535772241',
+  appId: '1:1015535772241:web:fc3b5c33e16491f627ce70',
+  measurementId: 'G-DN5CT21GSD'
+};
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const DEFAULT_SETTINGS = { webTitle:'DODOLAN', adminName:'Admin Riyan', adminPhoto:'https://placehold.co/100x100/0284c7/ffffff?text=Riyan', webLogo:'', template:'modern-blue', animation:'pulse' };
+const CATEGORIES = ['Rumah','Tanah','Mobil','Sepeda Motor','Elektronik'];
+let settings = {...DEFAULT_SETTINGS}, products=[], transactions=[], currentAdmin=null,
+    currentFilter='ALL', currentSearchQuery='', temporaryUploadedImages=[], pendingFileConversion=false,
+    unsubscribeOrders=null, currentView='catalog', productsLoaded=false;
+const $ = id => document.getElementById(id);
+const esc = s => String(s??'').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+const money = v => 'Rp ' + Number(v||0).toLocaleString('id-ID');
+const safeId = id => /^[A-Za-z0-9_-]{1,80}$/.test(String(id)) ? String(id) : '';
+const imageUrl = url => typeof url==='string' && (url.startsWith('https://') || /^data:image\/(webp|png|jpeg);base64,/i.test(url)) ? esc(url) : 'https://placehold.co/600x400/0284c7/ffffff?text=DODOLAN';
+
+function showToast(message, type='success') {
+  const container = $('toast-container');
+  if (!container) return;
+  const toast=document.createElement('div');
+  toast.className=`px-4 py-3 rounded-2xl shadow-xl text-white text-xs font-bold transition ${type==='success'?'bg-emerald-600':'bg-rose-600'}`;
+  toast.textContent=message;
+  container.appendChild(toast);
+  setTimeout(()=>toast.remove(),4000);
+}
+function switchView(name) {
+  if(name==='admin' && !currentAdmin) name='login';
+  currentView=name;
+  for(const item of ['catalog','detail','login','admin']) $('view-'+item).classList.toggle('hidden',item!==name);
+  if(name==='catalog') renderCatalog();
+  if(name==='admin'){renderAdminProducts();renderAdminTransactions();loadSettingsToForm();}
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function updateAdminGuestNav(){
+  $('admin-guest-nav').innerHTML=currentAdmin
+    ? `<button onclick="switchView('admin')" class="px-4 py-2 rounded-xl text-sm font-bold bg-blue-600 text-white shadow-md hover:bg-blue-700"><i class="fa-solid fa-gauge-high mr-1"></i><span class="hidden sm:inline">Admin Panel</span></button>`
+    : `<button onclick="switchView('login')" class="px-3 py-2 rounded-xl text-sm font-semibold text-slate-700 hover:bg-blue-50"><i class="fa-solid fa-lock text-blue-600 mr-1"></i><span>Login Admin</span></button>`;
+}
+function applySettingsToUI(){
+  $('page-title').textContent=`${settings.webTitle} - Marketplace by Riyan`;
+  $('brand-title').textContent=settings.webTitle;
+  $('logo-container').innerHTML=settings.webLogo ? `<img src="${imageUrl(settings.webLogo)}" alt="Logo" class="w-full h-full object-cover">` : '<i class="fa-solid fa-store text-xl"></i>';
+  $('admin-profile-preview-header').src=settings.adminPhoto||DEFAULT_SETTINGS.adminPhoto;
+  $('admin-welcome-name').textContent=`Halo, ${settings.adminName}`;
+}
+function filterCategory(cat){
+  currentFilter=cat;
+  document.querySelectorAll('.category-btn').forEach((btn,i)=>{
+    const chosen=(i===0?'ALL':CATEGORIES[i-1])===cat;
+    btn.className=`category-btn px-4 py-2 rounded-xl text-xs sm:text-sm transition whitespace-nowrap ${chosen?'font-bold bg-blue-600 text-white shadow-md':'font-semibold bg-slate-100 text-slate-700 hover:bg-blue-50'}`;
+  });
+  renderCatalog();
+}
+function handleSearch(){currentSearchQuery=$('search-input').value.toLowerCase();renderCatalog();}
+function renderCatalog(){
+  const grid=$('product-grid');
+  const filtered=products.filter(p=>(currentFilter==='ALL'||p.category===currentFilter) && (String(p.name||'').toLowerCase().includes(currentSearchQuery)||String(p.desc||'').toLowerCase().includes(currentSearchQuery)));
+  if(!filtered.length){
+    grid.innerHTML=`<div class="col-span-full py-14 text-center space-y-3 bg-white/95 rounded-3xl border border-blue-100 shadow-sm"><i class="fa-solid fa-box-open text-4xl text-slate-300"></i><p class="text-sm font-semibold text-slate-600">${productsLoaded?'Belum ada produk untuk kategori atau pencarian ini.':'Memuat katalog dari Firebase...'}</p>${currentAdmin?'<p class="text-xs text-slate-500">Buka Admin Panel untuk menambahkan produk.</p>':''}</div>`;
+    return;
+  }
+  grid.innerHTML=filtered.map(p=>{
+    const id=safeId(p.id),sold=p.status==='TERJUAL';
+    return `<article class="bg-white/95 backdrop-blur-md rounded-3xl shadow-xl overflow-hidden border border-blue-100 flex flex-col hover:shadow-2xl transition group animate-fade-in min-w-0">
+      <div class="relative h-52 overflow-hidden bg-slate-100 cursor-pointer" onclick="viewProductDetail('${id}')">
+        <img src="${imageUrl(p.images?.[0])}" alt="${esc(p.name)}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+        <span class="absolute top-3 left-3 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-extrabold text-blue-700 shadow uppercase">${esc(p.category)}</span>
+        ${sold?'<div class="absolute inset-0 bg-slate-900/60 flex items-center justify-center"><span class="px-4 py-2 bg-rose-600 text-white font-black text-lg rounded-xl -rotate-6">TERJUAL</span></div>':''}
+      </div><div class="p-5 space-y-3 flex-grow flex flex-col justify-between min-w-0"><div class="space-y-1 cursor-pointer" onclick="viewProductDetail('${id}')"><h3 class="font-bold text-slate-800 text-base line-clamp-2">${esc(p.name)}</h3><p class="text-xs text-slate-500 line-clamp-2">${esc(p.desc)}</p></div>
+      <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-2"><div class="min-w-0"><span class="text-[10px] text-slate-400 font-bold block">HARGA</span><span class="text-base font-extrabold text-blue-700 break-words">${money(p.price)}</span></div><button onclick="viewProductDetail('${id}')" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shrink-0">Detail</button></div></div></article>`;
+  }).join('');
+}
+function viewProductDetail(id){
+  const p=products.find(item=>String(item.id)===String(id));if(!p)return;
+  const sold=p.status==='TERJUAL';
+  const images=(Array.isArray(p.images)?p.images:[]);
+  const thumbs=images.length>1?`<div class="grid grid-cols-4 gap-2 mt-3">${images.map((img,i)=>`<button onclick="setPreviewImage('${safeId(p.id)}',${i})" aria-label="Foto ${i+1}"><img src="${imageUrl(img)}" class="w-full h-20 object-cover rounded-xl border-2 hover:border-blue-600" alt="Foto ${i+1}"></button>`).join('')}</div>`:'';
+  $('product-detail-container').innerHTML=`<div class="grid grid-cols-1 lg:grid-cols-2 gap-8"><div><img id="main-preview-img" src="${imageUrl(images[0])}" class="w-full h-72 sm:h-96 object-cover rounded-2xl shadow-lg" alt="${esc(p.name)}">${thumbs}</div>
+  <div class="space-y-6 flex flex-col justify-between"><div class="space-y-3"><div class="flex items-center gap-2 flex-wrap"><span class="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-extrabold rounded-full">${esc(p.category)}</span><span class="px-3 py-1 ${sold?'bg-rose-100 text-rose-700':'bg-emerald-100 text-emerald-700'} text-xs font-extrabold rounded-full">${esc(p.status)}</span></div>
+  <h2 class="text-2xl sm:text-3xl font-black text-slate-800">${esc(p.name)}</h2><div class="text-2xl font-black text-blue-700">${money(p.price)}</div><div class="pt-4 border-t border-slate-100"><h4 class="text-xs font-bold text-slate-400 mb-2">DESKRIPSI</h4><p class="text-sm text-slate-600 leading-relaxed whitespace-pre-line">${esc(p.desc)}</p></div></div>
+  ${sold?'<div class="w-full py-3 bg-slate-200 text-slate-500 font-bold rounded-xl text-center text-sm">Barang Sudah Terjual</div>':`<button onclick="openCheckoutModal('${safeId(p.id)}')" class="w-full py-3.5 bg-gradient-to-r from-blue-600 to-sky-500 text-white font-bold rounded-2xl shadow-lg"><i class="fa-solid fa-cart-shopping mr-2"></i> Pesan Sekarang</button>`}</div></div>`;
+  switchView('detail');
+}
+function setPreviewImage(id,index){const p=products.find(x=>x.id===id);if(p?.images?.[index])$('main-preview-img').src=p.images[index];}
+function openCheckoutModal(productId){
+  const p=products.find(x=>x.id===String(productId));if(!p||p.status!=='TERSEDIA')return;
+  $('checkout-prod-id').value=p.id;
+  $('checkout-product-info').innerHTML=`<img src="${imageUrl(p.images?.[0])}" class="w-16 h-16 object-cover rounded-xl" alt="Produk"><div><h4 class="font-bold text-sm text-slate-800 line-clamp-1">${esc(p.name)}</h4><span class="text-xs font-extrabold text-blue-700">${money(p.price)}</span></div>`;
+  $('checkout-modal').classList.remove('hidden');
+}
+function closeCheckoutModal(){$('checkout-modal').classList.add('hidden');}
+async function handleCheckoutSubmit(event){
+  event.preventDefault();
+  const id=$('checkout-prod-id').value,p=products.find(x=>x.id===id);
+  if(!p||p.status!=='TERSEDIA')return showToast('Produk tidak tersedia.','error');
+  const buyerName=$('buyer-name').value.trim(),buyerPhone=$('buyer-phone').value.trim(),buyerNote=$('buyer-note').value.trim();
+  if(buyerName.length<2||buyerName.length>80||!/^[0-9+() -]{8,24}$/.test(buyerPhone)||buyerNote.length>500)return showToast('Periksa nama, nomor HP, dan catatan.','error');
+  const submit=event.target.querySelector('button[type="submit"]');submit.disabled=true;submit.textContent='Mengirim pesanan...';
+  try{
+    await addDoc(collection(db,'orders'),{productId:p.id,productName:p.name,category:p.category,price:Number(p.price),buyerName,buyerPhone,buyerNote,date:new Date().toISOString(),status:'MENUNGGU',createdAt:serverTimestamp()});
+    closeCheckoutModal();event.target.reset();showToast('Pesanan terkirim! Admin akan mengonfirmasi pesanan.');
+  }catch(error){console.error(error);showToast('Pesanan gagal dikirim. Periksa koneksi/aturan Firestore.','error');}
+  finally{submit.disabled=false;submit.textContent='Kirim Pesanan ke Admin';}
+}
+async function handleLoginSubmit(event){
+  event.preventDefault();const email=$('login-user').value.trim(),password=$('login-pass').value;
+  const btn=event.target.querySelector('button[type="submit"]');btn.disabled=true;btn.textContent='Memeriksa akun...';
+  try{
+    const result=await signInWithEmailAndPassword(auth,email,password);
+    const adminSnap=await getDoc(doc(db,'admins',result.user.uid));
+    if(!adminSnap.exists()||adminSnap.data().active!==true){await signOut(auth);showToast('Akun belum diberi izin admin. Tambah admins/UID di Firestore.','error');return;}
+    showToast('Login Firebase berhasil!');
+  }catch(e){console.error(e);showToast('Login gagal. Periksa email/password dan pengaturan Firebase.','error');}
+  finally{btn.disabled=false;btn.textContent='Masuk Dashboard';$('login-pass').value='';}
+}
+async function handleLogout(){await signOut(auth);showToast('Berhasil keluar.');}
+function showImagePreviews(){
+  $('upload-preview-container').innerHTML=temporaryUploadedImages.map((url,i)=>`<img src="${imageUrl(url)}" alt="Foto ${i+1}" class="w-full h-16 object-cover rounded-xl border">`).join('');
+}
+// Resize locally to keep up to four photos inside one Firestore document (< 1 MiB).
+// The target 95,000 base64 characters per image is intentionally conservative.
+async function fileToSmallDataUrl(file,limit=95000,maxSide=1000){
+  if(!file.type.startsWith('image/')||file.size>15*1024*1024)throw Error('Gunakan foto JPG/PNG/WebP maksimal 15 MB.');
+  const url=URL.createObjectURL(file);
+  try{
+    const img=new Image();img.src=url;await img.decode();
+    let scale=Math.min(1,maxSide/Math.max(img.naturalWidth,img.naturalHeight));
+    for(let attempt=0;attempt<8;attempt++){
+      const canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(img.naturalWidth*scale));canvas.height=Math.max(1,Math.round(img.naturalHeight*scale));
+      canvas.getContext('2d',{alpha:false}).drawImage(img,0,0,canvas.width,canvas.height);
+      const quality=Math.max(.48,.78-attempt*.04),data=canvas.toDataURL('image/webp',quality);
+      if(data.startsWith('data:image/webp')&&data.length<=limit)return data;
+      scale*=.78;
+    }
+    throw Error('Foto terlalu rumit untuk disimpan. Coba foto lain.');
+  } finally {URL.revokeObjectURL(url);}
+}
+async function handleFileSelect(event){
+  const files=[...event.target.files];
+  if(files.length<1||files.length>4)return showToast('Pilih 1 hingga 4 foto.','error');
+  pendingFileConversion=true;temporaryUploadedImages=[];$('upload-preview-container').innerHTML='<span class="col-span-4 text-xs text-slate-500">Mengoptimalkan foto...</span>';
+  try{temporaryUploadedImages=await Promise.all(files.map(f=>fileToSmallDataUrl(f)));showImagePreviews();showToast('Foto siap diunggah ke Firestore.');}
+  catch(error){temporaryUploadedImages=[];event.target.value='';$('upload-preview-container').innerHTML='';showToast(error.message,'error');}
+  finally{pendingFileConversion=false;}
+}
+function validProduct(name,category,price,desc,images){return name.length>0&&name.length<=110&&CATEGORIES.includes(category)&&Number.isSafeInteger(price)&&price>0&&price<=10000000000000&&desc.length>0&&desc.length<=4000&&images.length>=1&&images.length<=4&&images.every(v=>typeof v==='string'&&v.length<=110000);}
+async function handleAddProduct(event){
+  event.preventDefault();if(!currentAdmin)return showToast('Login admin terlebih dahulu.','error');
+  if(pendingFileConversion)return showToast('Foto masih diproses.','error');
+  const name=$('prod-name').value.trim(),category=$('prod-cat').value,price=Number($('prod-price').value),desc=$('prod-desc').value.trim();
+  if(!validProduct(name,category,price,desc,temporaryUploadedImages))return showToast('Periksa nama, harga, deskripsi, dan 1–4 foto.','error');
+  const submit=event.target.querySelector('button[type="submit"]');submit.disabled=true;submit.textContent='Menyimpan...';
+  try{
+    const ref=doc(collection(db,'products'));
+    await setDoc(ref,{name,category,price,status:'TERSEDIA',desc,images:[...temporaryUploadedImages],createdAt:serverTimestamp()});
+    event.target.reset();temporaryUploadedImages=[];showImagePreviews();showToast('Produk berhasil tersimpan online!');
+  }catch(e){console.error(e);showToast('Gagal menyimpan produk. Periksa aturan Firestore.','error');}
+  finally{submit.disabled=false;submit.textContent='Simpan Produk';}
+}
+async function toggleProductStatus(id){
+  if(!currentAdmin||!safeId(id))return;
+  const p=products.find(x=>x.id===id);if(!p)return;
+  try{await updateDoc(doc(db,'products',id),{status:p.status==='TERSEDIA'?'TERJUAL':'TERSEDIA'});showToast('Status produk diperbarui online.');}
+  catch(e){console.error(e);showToast('Gagal mengubah status.','error');}
+}
+async function deleteProduct(id){
+  if(!currentAdmin||!safeId(id)||!confirm('Hapus produk ini dari semua perangkat?'))return;
+  try{await deleteDoc(doc(db,'products',id));showToast('Produk dihapus dari database.');}
+  catch(e){console.error(e);showToast('Gagal menghapus produk.','error');}
+}
+function renderAdminProducts(){
+  if(!currentAdmin)return;
+  $('admin-product-list').innerHTML=products.length?products.map(p=>`<div class="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-2xl gap-3"><div class="flex items-center space-x-3 min-w-0"><img src="${imageUrl(p.images?.[0])}" class="w-14 h-14 object-cover rounded-xl shrink-0" alt="Foto"><div class="min-w-0"><h4 class="font-bold text-sm text-slate-800 line-clamp-2">${esc(p.name)}</h4><div class="flex items-center gap-2 mt-0.5 flex-wrap"><span class="px-2 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-bold rounded">${esc(p.category)}</span><span class="px-2 py-0.5 ${p.status==='TERSEDIA'?'bg-emerald-100 text-emerald-700':'bg-rose-100 text-rose-700'} text-[10px] font-bold rounded">${esc(p.status)}</span></div><span class="text-xs font-bold text-blue-700">${money(p.price)}</span></div></div><div class="flex gap-2 shrink-0"><button onclick="toggleProductStatus('${safeId(p.id)}')" class="px-3 py-2 bg-amber-50 text-amber-700 rounded-xl" aria-label="Ubah status"><i class="fa-solid fa-rotate"></i></button><button onclick="deleteProduct('${safeId(p.id)}')" class="px-3 py-2 bg-rose-50 text-rose-600 rounded-xl" aria-label="Hapus"><i class="fa-solid fa-trash"></i></button></div></div>`).join(''):'<p class="text-xs text-slate-400 text-center py-4">Belum ada produk online.</p>';
+}
+function renderAdminTransactions(){
+  if(!currentAdmin)return;
+  const list=$('admin-transaction-list');
+  list.innerHTML=transactions.length?transactions.map(t=>`<article class="bg-slate-50 border border-slate-200 p-5 rounded-2xl space-y-3"><div class="flex items-center justify-between gap-2 flex-wrap border-b pb-3"><div><span class="text-xs font-extrabold text-blue-700">PESANAN ${esc(t.id.slice(0,8).toUpperCase())}</span><p class="text-[11px] text-slate-400">${esc(t.date?new Date(t.date).toLocaleString('id-ID'):'-')}</p></div><span class="px-3 py-1 ${t.status==='MENUNGGU'?'bg-amber-100 text-amber-800':t.status==='DITOLAK'?'bg-rose-100 text-rose-700':'bg-emerald-100 text-emerald-700'} text-xs font-bold rounded-xl">${esc(t.status)}</span></div><div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs"><div><b class="text-slate-500">BARANG</b><p class="font-bold">${esc(t.productName)}</p><p>${esc(t.category)}</p><p class="font-extrabold text-blue-700">${money(t.price)}</p></div><div><b class="text-slate-500">PEMBELI</b><p class="font-semibold">${esc(t.buyerName)} (${esc(t.buyerPhone)})</p><p class="italic">${esc(t.buyerNote||'-')}</p></div></div>${t.status==='MENUNGGU'?`<div class="flex flex-wrap gap-2"><button onclick="approveOrder('${safeId(t.id)}')" class="px-3 py-2 bg-emerald-600 text-white rounded-xl text-xs font-bold">Konfirmasi & tandai terjual</button><button onclick="rejectOrder('${safeId(t.id)}')" class="px-3 py-2 bg-rose-100 text-rose-700 rounded-xl text-xs font-bold">Tolak pesanan</button></div>`:''}</article>`).join(''):'<div class="text-center py-8 text-slate-400 text-xs">Belum ada pesanan masuk.</div>';
+}
+async function approveOrder(id){
+  if(!currentAdmin||!safeId(id))return;
+  const order=transactions.find(x=>x.id===id);
+  if(!order||order.status!=='MENUNGGU'||!confirm('Konfirmasi penjualan? Produk akan ditandai TERJUAL.'))return;
+  try{
+    const batch=writeBatch(db);
+    batch.update(doc(db,'orders',id),{status:'DISETUJUI'});
+    batch.update(doc(db,'products',order.productId),{status:'TERJUAL'});
+    await batch.commit();showToast('Pesanan dikonfirmasi dan produk ditandai TERJUAL.');
+  }catch(e){console.error(e);showToast('Gagal mengonfirmasi pesanan.','error');}
+}
+async function rejectOrder(id){
+  if(!currentAdmin||!safeId(id)||!confirm('Tolak pesanan ini?'))return;
+  try{await updateDoc(doc(db,'orders',id),{status:'DITOLAK'});showToast('Pesanan ditolak.');}
+  catch(e){console.error(e);showToast('Gagal menolak pesanan.','error');}
+}
+async function clearTransactions(){showToast('Penghapusan massal dinonaktifkan untuk mencegah hilangnya histori online.','error');}
+function switchAdminTab(tabName,button=null){
+  for(const tab of ['products','transactions','settings'])$('admin-tab-'+tab).classList.toggle('hidden',tab!==tabName);
+  document.querySelectorAll('.admin-tab-btn').forEach((btn,i)=>{const selected=['products','transactions','settings'][i]===tabName;btn.className=`admin-tab-btn px-4 py-2 rounded-xl text-xs font-bold transition ${selected?'bg-blue-600 text-white shadow':'bg-slate-100 text-slate-700 hover:bg-blue-50'}`;});
+}
+function loadSettingsToForm(){
+  $('set-admin-name').value=settings.adminName;
+  $('set-web-title').value=settings.webTitle;
+  $('set-template').value=settings.template;
+  $('set-animation').value=settings.animation;
+}
+async function handleSaveSettings(event){
+  event.preventDefault();if(!currentAdmin)return;
+  const next={...settings,adminName:$('set-admin-name').value.trim().slice(0,70),webTitle:$('set-web-title').value.trim().slice(0,45),template:$('set-template').value,animation:$('set-animation').value};
+  if(!next.adminName||!next.webTitle)return showToast('Isi nama admin dan nama website.','error');
+  const btn=event.target.querySelector('button[type="submit"]');btn.disabled=true;
+  try{
+    const adminPhoto=$('set-admin-photo').files[0],logo=$('set-web-logo').files[0];
+    if(adminPhoto)next.adminPhoto=await fileToSmallDataUrl(adminPhoto,55000,450);
+    if(logo)next.webLogo=await fileToSmallDataUrl(logo,55000,450);
+    await setDoc(doc(db,'siteConfig','public'),next);
+    showToast('Pengaturan website tersimpan online.');
+  }catch(e){console.error(e);showToast('Gagal menyimpan pengaturan.','error');}
+  finally{btn.disabled=false;}
+}
+// Optional migration for old browser-local data. Admin must confirm; do not silently overwrite Firebase.
+async function importLegacyData(){
+  if(!currentAdmin)return;
+  let oldProducts=[],oldTransactions=[],oldSettings=null;
+  try{oldProducts=JSON.parse(localStorage.getItem('dodolan_products')||'[]');oldTransactions=JSON.parse(localStorage.getItem('dodolan_transactions')||'[]');oldSettings=JSON.parse(localStorage.getItem('dodolan_settings')||'null');}catch{}
+  if(!Array.isArray(oldProducts))oldProducts=[];
+  if(!oldProducts.length&&!oldTransactions.length&&!oldSettings)return showToast('Tidak ada data lokal lama di browser ini.','error');
+  if(!confirm(`Impor ${oldProducts.length} produk dan ${oldTransactions.length} nota lama dari browser ini ke Firebase? Data online tidak dihapus.`))return;
+  let saved=0,failed=0;
+  for(const p of oldProducts){
+    try{
+      const images=[];
+      for(const img of (p.images||[]).slice(0,4)){
+        if(typeof img!=='string')continue;
+        if(/^data:image\//i.test(img)){
+          const blob=await(await fetch(img)).blob();
+          images.push(await fileToSmallDataUrl(new File([blob],'lama.png',{type:blob.type||'image/png'})));
+        }else if(img.startsWith('https://'))images.push(img.slice(0,110000));
+      }
+      const name=String(p.name||'').slice(0,110),category=p.category,desc=String(p.desc||'').slice(0,4000),price=Number(p.price);
+      if(!validProduct(name,category,price,desc,images))throw Error('Data produk tidak valid.');
+      await addDoc(collection(db,'products'),{name,category,price,status:p.status==='TERJUAL'?'TERJUAL':'TERSEDIA',desc,images,createdAt:serverTimestamp()});saved++;
+    }catch(e){console.error('Impor gagal',e);failed++;}
+  }
+  for(const t of (Array.isArray(oldTransactions)?oldTransactions:[])){
+    try{
+      const pName=String(t.productName||'').slice(0,110),cat=String(t.category||'');
+      if(!pName||!CATEGORIES.includes(cat))throw Error('Nota tidak lengkap');
+      await addDoc(collection(db,'orders'),{
+        productId:'legacy',productName:pName,category:cat,price:Number(t.price)||0,
+        buyerName:String(t.buyerName||'').slice(0,80),buyerPhone:String(t.buyerPhone||'').slice(0,24),buyerNote:String(t.buyerNote||'').slice(0,500),
+        date:new Date().toISOString(),status:'DISETUJUI',createdAt:serverTimestamp()
+      });saved++;
+    }catch(e){console.error('Impor nota gagal',e);failed++;}
+  }
+  if(oldSettings&&confirm('Impor pengaturan website lama juga?')){
+    try{
+      const next={...DEFAULT_SETTINGS,...oldSettings};
+      for(const k of ['adminPhoto','webLogo'])if(typeof next[k]==='string'&&next[k].startsWith('data:image/')){
+        const blob=await(await fetch(next[k])).blob();next[k]=await fileToSmallDataUrl(new File([blob],k+'.png',{type:blob.type||'image/png'}),55000,450);
+      }
+      await setDoc(doc(db,'siteConfig','public'),next);
+    }catch(e){console.error(e);failed++;}
+  }
+  showToast(`Impor selesai: ${saved} catatan berhasil, ${failed} gagal.`);
+}
+// Real-time public catalogue and site appearance (no admin session required).
+onSnapshot(collection(db,'products'),snap=>{
+  products=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+  productsLoaded=true;renderCatalog();if(currentAdmin)renderAdminProducts();
+  if(currentView==='detail')switchView('catalog');
+},error=>{console.error('Katalog Firestore',error);productsLoaded=true;renderCatalog();showToast('Katalog tidak dapat dimuat. Buat Firestore & publikasikan Rules.','error');});
+onSnapshot(doc(db,'siteConfig','public'),snap=>{
+  settings=snap.exists()?{...DEFAULT_SETTINGS,...snap.data()}:{...DEFAULT_SETTINGS};
+  applySettingsToUI();if(currentAdmin)loadSettingsToForm();
+},error=>{console.error('Pengaturan Firestore',error);showToast('Pengaturan website gagal dimuat.','error');});
+onAuthStateChanged(auth,async user=>{
+  currentAdmin=null;if(unsubscribeOrders){unsubscribeOrders();unsubscribeOrders=null;}
+  if(user){
+    try{
+      const adminDoc=await getDoc(doc(db,'admins',user.uid));
+      if(adminDoc.exists()&&adminDoc.data().active===true){
+        currentAdmin={uid:user.uid,email:user.email};
+        unsubscribeOrders=onSnapshot(collection(db,'orders'),snap=>{
+          transactions=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+          renderAdminTransactions();
+        },error=>{console.error(error);showToast('Tidak dapat membaca pesanan. Periksa Rules.','error');});
+        updateAdminGuestNav();if(currentView==='login')switchView('admin');return;
+      }
+      await signOut(auth);
+    }catch(e){console.error('Cek admin',e);showToast('Gagal memeriksa izin admin. Periksa dokumen admins/UID.','error');}
+  }
+  transactions=[];updateAdminGuestNav();if(currentView==='admin')switchView('catalog');
+});
+applySettingsToUI();updateAdminGuestNav();renderCatalog();
+Object.assign(window,{switchView,filterCategory,handleSearch,viewProductDetail,setPreviewImage,openCheckoutModal,closeCheckoutModal,handleCheckoutSubmit,handleLoginSubmit,handleLogout,handleFileSelect,handleAddProduct,toggleProductStatus,deleteProduct,approveOrder,rejectOrder,renderAdminProducts,renderAdminTransactions,clearTransactions,switchAdminTab,handleSaveSettings,importLegacyData});
+
+    </script>
+</body>
+</html>
