@@ -126,7 +126,7 @@ body[data-theme="coffee-cream"] { --accent-600: #92400e; --accent-soft: #d6a86d;
         button { touch-action: manipulation; }
         #view-catalog, #view-detail, #view-login, #view-admin { width:100%; min-width:0; }
         main > section, main > section > * { min-width:0; }
-        #toast-container { max-width:calc(100vw - 1.5rem); right: .75rem; top: max(.75rem, env(safe-area-inset-top)); }
+        #toast-container { max-width:min(400px,calc(100vw - 1.5rem)); right: .75rem; top: max(5.25rem, env(safe-area-inset-top)); }
         #toast-container > * { overflow-wrap:anywhere; }
         #main-header .brand-wrap > div:last-child { min-width:0; }
         #brand-title { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width: 16rem; }
@@ -580,7 +580,7 @@ body[data-theme="coffee-cream"] { --accent-600: #92400e; --accent-soft: #d6a86d;
                                     <option value="photo-soft">Foto + Overlay Lembut</option>
                                     <option value="photo-bold">Foto Lebih Jelas</option>
                                 </select>
-                                <label class="mt-3 inline-flex items-center gap-2 text-xs font-semibold text-slate-600"><input type="checkbox" id="set-clear-page-bg" class="rounded border-slate-300"> Hapus background foto</label>
+                                <label class="mt-3 inline-flex items-center gap-2 text-xs font-semibold text-slate-600"><input type="checkbox" id="set-clear-page-bg" onchange="previewBackgroundMode($('set-background-mode').value)" class="rounded border-slate-300"> Hapus background foto</label>
                             </div>
                         </div>
                         <div class="rounded-2xl border border-slate-200 bg-slate-50 p-3 space-y-2">
@@ -621,12 +621,13 @@ body[data-theme="coffee-cream"] { --accent-600: #92400e; --accent-soft: #d6a86d;
                         <div class="space-y-3 pt-2">
                             <div class="flex flex-wrap items-center justify-between gap-2">
                                 <label class="text-xs font-bold text-slate-700 uppercase tracking-wider">Galeri 13 Tema Warna</label>
-                                <span class="text-[11px] text-slate-500">Ketuk tema untuk melihat pratinjau</span>
+                                <span class="text-[11px] text-slate-500">Ketuk tema, kemudian simpan ke Firebase</span>
                             </div>
                             <div id="theme-preview-grid" class="theme-preview-grid" role="group" aria-label="Pilihan tema warna website"></div>
                             <p id="theme-preview-status" class="text-xs text-slate-600" aria-live="polite">Pilih tema, lalu klik Simpan Pengaturan.</p>
                         </div>
                         <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg transition">Simpan Pengaturan & Tema</button>
+                        <div id="settings-save-result" role="status" aria-live="polite" class="hidden text-sm leading-relaxed rounded-xl px-4 py-3"></div>
                     </form>
                     <div class="border-t border-blue-100 pt-4 space-y-2"><h4 class="text-sm font-bold">Pindahkan produk versi lama</h4><p class="text-xs text-slate-500">Jika sebelumnya menambah produk pada browser yang sama, impor secara manual ke Firestore. Data online tidak dihapus.</p><button onclick="importLegacyData()" class="px-4 py-2 text-sm bg-blue-100 text-blue-800 rounded-xl font-semibold">Impor data lama dari browser ini</button></div>
                 </div>
@@ -798,27 +799,26 @@ function renderBackgroundPreview(url=settings.pageBackground||''){
 }
 let previewBackgroundData=null;
 function previewBackgroundMode(mode){
-  const selected=['gradient','photo-soft','photo-bold'].includes(mode)?mode:'gradient';
-  document.body.dataset.bgmode=selected;
-  const fileBg=previewBackgroundData||settings.pageBackground||'';
-  const bg=$('set-clear-page-bg')?.checked?'':fileBg;
-  document.body.style.setProperty('--page-bg-image',selected!=='gradient'&&bg?`url("${cssUrlImage(bg)}")`:'none');
-  renderBackgroundPreview(selected==='gradient'?'':bg);
+  const activeMode=['gradient','photo-soft','photo-bold'].includes(mode)?mode:'gradient';
+  document.body.dataset.bgmode=activeMode;
+  const photo=$('set-clear-page-bg')?.checked ? '' : (previewBackgroundData || settings.pageBackground || '');
+  const effective=activeMode==='gradient'?'':photo;
+  document.body.style.setProperty('--page-bg-image',effective?`url("${cssUrlImage(effective)}")`:'none');
+  renderBackgroundPreview(effective);
 }
 async function previewLocalBackground(event){
   const file=event?.target?.files?.[0];
-  if(!file){
+  if(!file){previewBackgroundData=null;previewBackgroundMode($('set-background-mode').value);return;}
+  try{
+    previewBackgroundData=await fileToSmallDataUrl(file,90000,1200);
+    if($('set-clear-page-bg')) $('set-clear-page-bg').checked=false;
+    if($('set-background-mode').value==='gradient') $('set-background-mode').value='photo-soft';
+    previewBackgroundMode($('set-background-mode').value);
+  }catch(e){
+    console.error('Preview background',e);
     previewBackgroundData=null;
-    previewBackgroundMode($('set-background-mode')?.value||settings.backgroundMode);
-    return;
-  }
-  try {
-    const data = await fileToSmallDataUrl(file, 120000, 1500);
-    previewBackgroundData=data;
-    previewBackgroundMode($('set-background-mode')?.value||'photo-soft');
-  } catch (e) {
-    console.error(e);
-    showToast('Preview background gagal dimuat.','error');
+    if(event?.target)event.target.value='';
+    showToast('Foto background gagal diproses. Gunakan JPG/PNG yang lebih kecil.','error');
   }
 }
 
@@ -1137,7 +1137,25 @@ function switchAdminTab(tabName,button=null){
   for(const tab of ['products','transactions','settings'])$('admin-tab-'+tab).classList.toggle('hidden',tab!==tabName);
   document.querySelectorAll('.admin-tab-btn').forEach((btn,i)=>{const selected=['products','transactions','settings'][i]===tabName;btn.className=`admin-tab-btn px-4 py-2 rounded-xl text-xs font-bold transition ${selected?'bg-blue-600 text-white shadow':'bg-slate-100 text-slate-700 hover:bg-blue-50'}`;});
 }
+function showSettingsSaveResult(message,level='error'){
+  const el=$('settings-save-result');
+  if(!el)return;
+  if(!message){el.classList.add('hidden');el.textContent='';return;}
+  el.textContent=message;
+  el.className='text-sm leading-relaxed rounded-xl px-4 py-3 '+(level==='success'?'bg-emerald-50 border border-emerald-200 text-emerald-900':level==='info'?'bg-sky-50 border border-sky-200 text-sky-900':'bg-rose-50 border border-rose-200 text-rose-900');
+}
+function explainSettingsError(error){
+  const code=String(error?.code||'').toLowerCase();
+  const message=String(error?.message||'');
+  if(code.includes('permission-denied'))return 'Firestore menolak penyimpanan (permission-denied). Login admin sudah masuk, tetapi Rules untuk dokumen siteConfig/public belum mengizinkan perubahan ini. Periksa Firebase Console → Firestore Database → Rules. Jangan mengizinkan semua orang menulis.';
+  if(code.includes('unauthenticated'))return 'Sesi Firebase sudah berakhir (unauthenticated). Login ulang sebagai admin, kemudian simpan kembali.';
+  if(code.includes('resource-exhausted')||message.toLowerCase().includes('too large')||message.toLowerCase().includes('size limit'))return 'Data pengaturan terlalu besar untuk Firestore. Coba tanpa foto background, atau gunakan foto yang lebih kecil.';
+  if(code.includes('unavailable')||code.includes('deadline-exceeded')||code.includes('network-request-failed'))return 'Koneksi Firebase sedang bermasalah. Periksa internet, lalu coba simpan lagi.';
+  if(code.includes('invalid-argument'))return 'Ada isi pengaturan yang ditolak Firebase (invalid-argument). Periksa foto dan nilai input.';
+  return `Firebase menolak penyimpanan${code?` (${code})`:''}. ${message?message.slice(0,160):'Periksa izin Firestore untuk siteConfig/public dan koneksi.'}`;
+}
 function loadSettingsToForm(){
+  showSettingsSaveResult('');
   $('set-admin-name').value=settings.adminName;
   $('set-web-title').value=settings.webTitle;
   $('set-admin-whatsapp').value=settings.adminWhatsapp||'+6282220221046';
@@ -1155,22 +1173,54 @@ function loadSettingsToForm(){
   updateProductDescriptionHint();
 }
 async function handleSaveSettings(event){
-  event.preventDefault();if(!currentAdmin)return;
-  const next={...settings,adminName:$('set-admin-name').value.trim().slice(0,70),webTitle:$('set-web-title').value.trim().slice(0,45),adminWhatsapp:$('set-admin-whatsapp').value.trim(),template:safeThemeName($('set-template').value),animation:$('set-animation').value,backgroundMode:['gradient','photo-soft','photo-bold'].includes($('set-background-mode').value)?$('set-background-mode').value:'gradient'};
-  if(!next.adminName||!next.webTitle)return showToast('Isi nama admin dan nama website.','error');
-  if(!/^\d{10,16}$/.test(whatsappNumber(next.adminWhatsapp)))return showToast('Periksa nomor WhatsApp admin. Gunakan nomor Indonesia yang aktif.','error');
-  const btn=event.target.querySelector('button[type="submit"]');btn.disabled=true;
+  event.preventDefault();
+  if(!currentAdmin){showSettingsSaveResult('Anda harus login sebagai admin untuk menyimpan.');return;}
+  showSettingsSaveResult('');
+  const next={
+    ...settings,
+    adminName:$('set-admin-name').value.trim().slice(0,70),
+    webTitle:$('set-web-title').value.trim().slice(0,45),
+    adminWhatsapp:$('set-admin-whatsapp').value.trim(),
+    template:safeThemeName($('set-template').value),
+    animation:$('set-animation').value,
+    backgroundMode:['gradient','photo-soft','photo-bold'].includes($('set-background-mode').value)?$('set-background-mode').value:'gradient'
+  };
+  if(!next.adminName||!next.webTitle){showSettingsSaveResult('Nama admin dan judul website harus diisi.');return;}
+  if(!/^\d{10,16}$/.test(whatsappNumber(next.adminWhatsapp))){showSettingsSaveResult('Nomor WhatsApp admin tidak valid.');return;}
+  const btn=event.target.querySelector('button[type="submit"]');
+  btn.disabled=true;
+  const priorLabel=btn.textContent;
+  btn.textContent='Menyimpan pengaturan...';
   try{
     const adminPhoto=$('set-admin-photo').files[0],logo=$('set-web-logo').files[0],pageBg=$('set-page-bg').files[0];
-    if(adminPhoto)next.adminPhoto=await fileToSmallDataUrl(adminPhoto,55000,450);
-    if(logo)next.webLogo=await fileToSmallDataUrl(logo,55000,450);
-    if($('set-clear-page-bg')?.checked) next.pageBackground='';
-    if(pageBg) next.pageBackground=await fileToSmallDataUrl(pageBg,120000,1500);
-    await setDoc(doc(db,'siteConfig','public'),next);
-    showToast('Pengaturan website tersimpan online.');
-  }catch(e){console.error(e);showToast('Gagal menyimpan pengaturan.','error');}
-  finally{btn.disabled=false;}
+    if(adminPhoto)next.adminPhoto=await fileToSmallDataUrl(adminPhoto,45000,420);
+    if(logo)next.webLogo=await fileToSmallDataUrl(logo,45000,420);
+    if($('set-clear-page-bg')?.checked)next.pageBackground='';
+    else if(pageBg)next.pageBackground=previewBackgroundData||await fileToSmallDataUrl(pageBg,90000,1200);
+    // Simpan hanya field yang berubah. Data lama dan field lain di Firebase tetap utuh.
+    const patch={};
+    for(const key of ['adminName','webTitle','adminWhatsapp','template','animation','backgroundMode','adminPhoto','webLogo','pageBackground']){
+      if(next[key]!==settings[key]&&next[key]!==undefined)patch[key]=next[key];
+    }
+    if(!Object.keys(patch).length){showSettingsSaveResult('Tidak ada perubahan baru. Pengaturan yang tampil masih sama.','info');return;}
+    await setDoc(doc(db,'siteConfig','public'),patch,{merge:true});
+    settings={...settings,...patch};
+    applySettingsToUI();
+    previewBackgroundData=null;
+    if(pageBg) $('set-page-bg').value='';
+    if($('set-clear-page-bg')) $('set-clear-page-bg').checked=false;
+    showSettingsSaveResult('Berhasil! Pengaturan disimpan di Firestore dan akan tampil pada perangkat lain.','success');
+    showToast('Pengaturan website berhasil disimpan.');
+  }catch(error){
+    console.error('Gagal menyimpan siteConfig/public:',error);
+    showSettingsSaveResult(explainSettingsError(error));
+    showToast('Pengaturan belum tersimpan. Baca keterangan di bawah tombol Simpan.','error');
+  }finally{
+    btn.disabled=false;
+    btn.textContent=priorLabel;
+  }
 }
+
 // Optional migration for old browser-local data. Admin must confirm; do not silently overwrite Firebase.
 async function importLegacyData(){
   if(!currentAdmin)return;
