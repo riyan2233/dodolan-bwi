@@ -316,6 +316,7 @@ body[data-theme="coffee-cream"] { --accent-600: #92400e; --accent-soft: #d6a86d;
                     <button type="submit" class="w-full py-3 bg-gradient-to-r from-blue-600 to-sky-500 hover:from-blue-700 hover:to-sky-600 text-white font-bold rounded-xl shadow-lg shadow-blue-500/30 transition">
                         Masuk Dashboard
                     </button>
+                    <div id="login-error-detail" role="alert" aria-live="polite" class="hidden rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs font-semibold leading-relaxed text-rose-800"></div>
                     <div class="text-center">
                         <p class="text-xs text-slate-400">Gunakan akun Email/Password Firebase yang sudah diberi akses admin.</p>
                     </div>
@@ -520,7 +521,7 @@ import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from
 import { getFirestore, collection, doc, getDoc, onSnapshot, addDoc, setDoc, updateDoc, deleteDoc, writeBatch, serverTimestamp } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js';
 
 const firebaseConfig = {
-  apiKey: 'AIzaSyBsAdrihgLonDorEHg1VR_yqS-LUw5efn8',
+  apiKey: 'AIzaSyBsAdrihgLonDorEHglVR_yqS-LUw5efn8',
   authDomain: 'dodolan-bwi.firebaseapp.com',
   projectId: 'dodolan-bwi',
   storageBucket: 'dodolan-bwi.firebasestorage.app',
@@ -674,16 +675,52 @@ async function handleCheckoutSubmit(event){
   }catch(error){console.error(error);showToast('Pesanan gagal dikirim. Periksa koneksi/aturan Firestore.','error');}
   finally{submit.disabled=false;submit.textContent='Kirim Pesanan ke Admin';}
 }
+// Informasi kesalahan login di halaman (tanpa memperlihatkan kata sandi atau token).
+function setLoginError(message=''){
+  const panel=$('login-error-detail');
+  if(!panel)return;
+  panel.textContent=message;
+  panel.classList.toggle('hidden',!message);
+}
+function describeFirebaseLoginError(error){
+  const code=String(error?.code||'').toLowerCase();
+  if(code.includes('api-key-not-valid') || code.includes('invalid-api-key'))
+    return 'API Key ditolak Firebase ('+code+'). Periksa bahwa kunci di index.html sama persis dengan Google Cloud, termasuk huruf l dan angka 1.';
+  if(['auth/invalid-credential','auth/invalid-login-credentials','auth/wrong-password','auth/user-not-found','auth/invalid-email'].includes(code))
+    return 'Email atau password tidak cocok ('+code+'). Periksa akun di Firebase Authentication > Users.';
+  if(code==='auth/operation-not-allowed')
+    return 'Metode login Email/Password belum aktif. Buka Firebase Authentication > Sign-in method.';
+  if(code==='auth/unauthorized-domain')
+    return 'Domain website belum diizinkan. Buka Firebase Authentication > Settings > Authorized domains.';
+  if(code==='auth/too-many-requests')
+    return 'Terlalu banyak percobaan login. Jangan ulangi berkali-kali; coba lagi setelah pembatasan Firebase selesai.';
+  if(code==='permission-denied' || code==='firestore/permission-denied')
+    return 'Akun login, tetapi akses ke dokumen admin di Firestore ditolak. Periksa Firestore Rules dan admins/UID.';
+  if(code==='auth/network-request-failed')
+    return 'Koneksi ke Firebase terputus. Periksa internet dan coba muat ulang halaman.';
+  return 'Login gagal ('+(code||'kode tidak tersedia')+'). Kirim screenshot pesan ini untuk pemeriksaan lanjutan.';
+}
 async function handleLoginSubmit(event){
-  event.preventDefault();const email=$('login-user').value.trim(),password=$('login-pass').value;
-  const btn=event.target.querySelector('button[type="submit"]');btn.disabled=true;btn.textContent='Memeriksa akun...';
+  event.preventDefault();
+  const email=$('login-user').value.trim(),password=$('login-pass').value;
+  const btn=event.target.querySelector('button[type="submit"]');
+  setLoginError('');btn.disabled=true;btn.textContent='Memeriksa akun...';
   try{
     const result=await signInWithEmailAndPassword(auth,email,password);
     const adminSnap=await getDoc(doc(db,'admins',result.user.uid));
-    if(!adminSnap.exists()||adminSnap.data().active!==true){await signOut(auth);showToast('Akun belum diberi izin admin. Tambah admins/UID di Firestore.','error');return;}
+    if(!adminSnap.exists()||adminSnap.data().active!==true){
+      await signOut(auth);
+      const message='Login Firebase berhasil, tetapi akun tidak mempunyai akses admin. Periksa dokumen Firestore admins/UID dan pastikan active = true.';
+      setLoginError(message);showToast(message,'error');return;
+    }
     showToast('Login Firebase berhasil!');
-  }catch(e){console.error(e);showToast('Login gagal. Periksa email/password dan pengaturan Firebase.','error');}
-  finally{btn.disabled=false;btn.textContent='Masuk Dashboard';$('login-pass').value='';}
+  }catch(e){
+    console.error('Kesalahan login Firebase',e);
+    const message=describeFirebaseLoginError(e);
+    setLoginError(message);showToast(message,'error');
+  }finally{
+    btn.disabled=false;btn.textContent='Masuk Dashboard';$('login-pass').value='';
+  }
 }
 async function handleLogout(){await signOut(auth);showToast('Berhasil keluar.');}
 function showImagePreviews(){
